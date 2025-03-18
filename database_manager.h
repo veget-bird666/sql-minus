@@ -2,9 +2,10 @@
 #define DATABASE_MANAGER_H
 #include <QString>
 #include "database_operations.h"
+#include "manager.h"
 
 // test
-class DatabaseManager {
+class DatabaseManager : Manager{
 public:
     static void createDatabase(const CreateDatabaseOperation* operation);
     static void dropDatabase(const DropDatabaseOperation* operation);
