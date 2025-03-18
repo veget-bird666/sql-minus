@@ -1,12 +1,18 @@
 #include "database_operations.h"
-#include "file_utils.h"
+#include "database_manager.h"
 
 // 创建数据库操作
 void CreateDatabaseOperation::execute(){
-    FileWriteUtil::createDatabase(dbName);
+    DatabaseManager::createDatabase(this);
 }
 
 // 删除数据库操作
 void DropDatabaseOperation::execute(){
-    FileWriteUtil::dropDatabase(dbName);
+    DatabaseManager::dropDatabase(this);
 }
+
+// 显示所有数据库操作
+void ShowDatabasesOperation::execute(){
+    DatabaseManager::showDatabases();
+}
+

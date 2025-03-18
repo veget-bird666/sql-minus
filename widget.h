@@ -2,6 +2,8 @@
 #define WIDGET_H
 
 #include <QWidget>
+#include <QString>
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -17,6 +19,8 @@ public:
 
     Widget(QWidget *parent = nullptr);
     ~Widget();
+
+    void showMessage(QString message);
 
 private slots:
     void on_clearButton_clicked();

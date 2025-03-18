@@ -17,12 +17,14 @@ sql_minus_autogen/timestamp: \
 	C:/Users/lenovo/Desktop/DB_Project1/sql_minus/operation.h \
 	C:/Users/lenovo/Desktop/DB_Project1/sql_minus/sqlparser.cpp \
 	C:/Users/lenovo/Desktop/DB_Project1/sql_minus/sqlparser.h \
+	C:/Users/lenovo/Desktop/DB_Project1/sql_minus/structures.h \
 	C:/Users/lenovo/Desktop/DB_Project1/sql_minus/table_manager.cpp \
 	C:/Users/lenovo/Desktop/DB_Project1/sql_minus/table_manager.h \
 	C:/Users/lenovo/Desktop/DB_Project1/sql_minus/table_operations.cpp \
 	C:/Users/lenovo/Desktop/DB_Project1/sql_minus/table_operations.h \
 	C:/Users/lenovo/Desktop/DB_Project1/sql_minus/widget.cpp \
 	C:/Users/lenovo/Desktop/DB_Project1/sql_minus/widget.h \
+	D:/Qt/6.7.2/mingw_64/include/QtCore/QString \
 	D:/Qt/6.7.2/mingw_64/include/QtCore/q20functional.h \
 	D:/Qt/6.7.2/mingw_64/include/QtCore/q20memory.h \
 	D:/Qt/6.7.2/mingw_64/include/QtCore/q20type_traits.h \

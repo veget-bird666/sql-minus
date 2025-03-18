@@ -1,5 +1,6 @@
 C:/Users/lenovo/Desktop/DB_Project1/sql_minus/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/sql_minus_autogen/EWIEGA46WW/moc_widget.cpp: C:/Users/lenovo/Desktop/DB_Project1/sql_minus/widget.h \
   C:/Users/lenovo/Desktop/DB_Project1/sql_minus/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/sql_minus_autogen/moc_predefs.h \
+  D:/Qt/6.7.2/mingw_64/include/QtCore/QString \
   D:/Qt/6.7.2/mingw_64/include/QtCore/q20functional.h \
   D:/Qt/6.7.2/mingw_64/include/QtCore/q20memory.h \
   D:/Qt/6.7.2/mingw_64/include/QtCore/q20type_traits.h \

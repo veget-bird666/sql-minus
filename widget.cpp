@@ -15,6 +15,7 @@ Widget::~Widget()
     delete ui;
 }
 
+
 // 清除按键
 void Widget::on_clearButton_clicked()
 {
@@ -27,12 +28,16 @@ void Widget::on_executeButton_clicked()
 
     QString sql_command = ui->commandEdit->toPlainText();
     try {
+
         Operation* o = SqlParser::parse(sql_command);
         o->execute();
     } catch (...) {
-        qDebug()<<"command is not correct";
+        showMessage("SQL command is not correct.");
     }
+}
 
-
+// 粘贴文本操作
+void Widget::showMessage(QString message){
+    ui->informationEdit->append(message);
 }
 

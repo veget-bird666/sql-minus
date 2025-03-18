@@ -35,6 +35,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         table_operations.cpp
         table_manager.h
         table_manager.cpp
+        structures.h
 
 
 

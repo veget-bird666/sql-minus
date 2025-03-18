@@ -29,26 +29,37 @@ public:
     {
         if (Widget->objectName().isEmpty())
             Widget->setObjectName("Widget");
-        Widget->resize(800, 600);
+        Widget->resize(612, 600);
+        Widget->setStyleSheet(QString::fromUtf8("background-color: rgb(43, 45, 48);\n"
+"color:white;"));
         commandEdit = new QTextEdit(Widget);
         commandEdit->setObjectName("commandEdit");
-        commandEdit->setGeometry(QRect(130, 70, 531, 351));
+        commandEdit->setGeometry(QRect(40, 40, 531, 131));
         QFont font;
         font.setPointSize(12);
         commandEdit->setFont(font);
+        commandEdit->setStyleSheet(QString::fromUtf8("background-color: rgb(30, 31, 34);\n"
+"color:white;"));
         executeButton = new QPushButton(Widget);
         executeButton->setObjectName("executeButton");
-        executeButton->setGeometry(QRect(130, 520, 151, 51));
+        executeButton->setGeometry(QRect(40, 520, 151, 51));
         QFont font1;
         font1.setPointSize(11);
         executeButton->setFont(font1);
+        executeButton->setStyleSheet(QString::fromUtf8("background-color: rgb(30, 31, 34);\n"
+"color:white;"));
         clearButton = new QPushButton(Widget);
         clearButton->setObjectName("clearButton");
-        clearButton->setGeometry(QRect(500, 520, 161, 51));
+        clearButton->setGeometry(QRect(410, 520, 161, 51));
         clearButton->setFont(font1);
+        clearButton->setStyleSheet(QString::fromUtf8("background-color: rgb(30, 31, 34);\n"
+"color:white;"));
         informationEdit = new QTextEdit(Widget);
         informationEdit->setObjectName("informationEdit");
-        informationEdit->setGeometry(QRect(130, 440, 531, 66));
+        informationEdit->setGeometry(QRect(40, 200, 531, 301));
+        informationEdit->setFont(font1);
+        informationEdit->setStyleSheet(QString::fromUtf8("background-color: rgb(30, 31, 34);\n"
+"color:white;"));
 
         retranslateUi(Widget);
 
