@@ -3,7 +3,7 @@
 #include <QString>
 #include "database_operations.h"
 
-//
+// test
 class DatabaseManager {
 public:
     static void createDatabase(const CreateDatabaseOperation* operation);
