@@ -49,4 +49,3 @@ Operation* SqlParser::parse(const QString& sql) {
     throw std::invalid_argument("Invalid SQL syntax");
 }
 
-

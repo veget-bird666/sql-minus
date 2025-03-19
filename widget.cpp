@@ -40,4 +40,3 @@ void Widget::on_executeButton_clicked()
 void Widget::showMessage(QString message){
     ui->informationEdit->append(message);
 }
-

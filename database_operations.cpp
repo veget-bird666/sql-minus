@@ -15,4 +15,3 @@ void DropDatabaseOperation::execute(){
 void ShowDatabasesOperation::execute(){
     DatabaseManager::showDatabases();
 }
-

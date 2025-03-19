@@ -6,43 +6,23 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>612</width>
-    <height>600</height>
+    <width>611</width>
+    <height>587</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Widget</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(43, 45, 48);
-color:white;</string>
+   <string notr="true">background-color:rgb(43, 45, 48);</string>
   </property>
   <widget class="QTextEdit" name="commandEdit">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>40</y>
-     <width>531</width>
-     <height>131</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>12</pointsize>
-    </font>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(30, 31, 34);
-color:white;</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="executeButton">
-   <property name="geometry">
-    <rect>
-     <x>40</x>
-     <y>520</y>
-     <width>151</width>
-     <height>51</height>
+     <x>50</x>
+     <y>50</y>
+     <width>511</width>
+     <height>141</height>
     </rect>
    </property>
    <property name="font">
@@ -51,8 +31,46 @@ color:white;</string>
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(30, 31, 34);
-color:white;</string>
+    <string notr="true">color:white;
+background-color:rgb(30, 31, 34);</string>
+   </property>
+  </widget>
+  <widget class="QTextEdit" name="informationEdit">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>230</y>
+     <width>511</width>
+     <height>231</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color:white;
+background-color:rgb(30, 31, 34);</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="executeButton">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>500</y>
+     <width>161</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>11</pointsize>
+    </font>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">color:white;
+background-color:rgb(30, 31, 34);</string>
    </property>
    <property name="text">
     <string>执行</string>
@@ -61,10 +79,10 @@ color:white;</string>
   <widget class="QPushButton" name="clearButton">
    <property name="geometry">
     <rect>
-     <x>410</x>
-     <y>520</y>
+     <x>400</x>
+     <y>500</y>
      <width>161</width>
-     <height>51</height>
+     <height>61</height>
     </rect>
    </property>
    <property name="font">
@@ -73,30 +91,11 @@ color:white;</string>
     </font>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(30, 31, 34);
-color:white;</string>
+    <string notr="true">color:white;
+background-color:rgb(30, 31, 34);</string>
    </property>
    <property name="text">
     <string>清除</string>
-   </property>
-  </widget>
-  <widget class="QTextEdit" name="informationEdit">
-   <property name="geometry">
-    <rect>
-     <x>40</x>
-     <y>200</y>
-     <width>531</width>
-     <height>301</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <pointsize>11</pointsize>
-    </font>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(30, 31, 34);
-color:white;</string>
    </property>
   </widget>
  </widget>

@@ -24,21 +24,22 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         database_manager.h
-        database_manager.cpp
         database_operations.h
-        database_operations.cpp
-        operation.h operation.cpp
-        sqlparser.h sqlparser.cpp
-        file_utils.h file_utils.cpp
+        file_utils.h
         manager.h
-        table_operations.h
-        table_operations.cpp
-        table_manager.h
-        table_manager.cpp
+        operation.h
+        sqlparser.h
+        sqlparser.h
         structures.h
-
-
-
+        table_manager.h
+        table_operations.h
+        database_manager.cpp
+        database_operations.cpp
+        file_utils.cpp
+        operation.cpp
+        sqlparser.cpp
+        table_manager.cpp
+        table_operations.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET sql_minus APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

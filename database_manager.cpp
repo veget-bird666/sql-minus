@@ -21,7 +21,7 @@ void DatabaseManager::createDatabase(const CreateDatabaseOperation* operation) {
 
     // 填充字段
     strncpy(block.name, dbName.toUtf8().constData(), 128);
-    block.type = false; // 用户数据库
+    block.type = true; // 用户数据库
     strncpy(block.filename, ("D:/DBMS_ROOT/data/" + dbName).toUtf8().constData(), 256);
     block.crtime = QDateTime::currentSecsSinceEpoch();
 
@@ -40,9 +40,9 @@ void DatabaseManager::dropDatabase(const DropDatabaseOperation* operation) {
     QString dbName = operation->dbName;
     try {
         // 1. 检查是否为系统数据库（如 Ruanko）
-        if (dbName == "Ruanko") {
-            throw std::runtime_error("系统数据库不可删除");
-        }
+        // if (dbName == "Ruanko") {
+        //     throw std::runtime_error("系统数据库不可删除");
+        // }
 
         // 2. 检查数据库是否存在
         std::vector<DatabaseBlock> databases = FileUtil::readAllDatabaseBlocks();
@@ -101,6 +101,5 @@ void DatabaseManager::showDatabases(){
         qCritical() << "读取数据库列表失败:" << e.what();
     }
 }
-
 
 
