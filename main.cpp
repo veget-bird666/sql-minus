@@ -2,7 +2,7 @@
 #include <QApplication>
 Widget* widget;
 
-// test
+// test aaa
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
