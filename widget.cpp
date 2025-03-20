@@ -32,7 +32,7 @@ void Widget::on_executeButton_clicked()
         Operation* o = SqlParser::parse(sql_command);
         o->execute();
     } catch (...) {
-        showMessage("SQL command is not correct.");
+        showMessage("输入指令格式错误");
     }
 }
 
