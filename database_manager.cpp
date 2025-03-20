@@ -30,7 +30,7 @@ void DatabaseManager::createDatabase(const CreateDatabaseOperation* operation) {
     FileUtil::appendDatabaseRecord(block);
 
     // 返回信息
-    widget->showMessage("successfully create database "+dbName+".");
+    widget->showMessage("成功创建数据库："+dbName+".");
 }
 
 
