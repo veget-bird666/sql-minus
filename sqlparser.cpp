@@ -46,6 +46,6 @@ Operation* SqlParser::parse(const QString& sql) {
     }
 
     // 都未匹配，则抛出异常
-    throw std::invalid_argument("Invalid SQL syntax");
+    throw std::invalid_argument("输入指令格式错误");
 }
 
