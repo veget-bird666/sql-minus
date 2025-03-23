@@ -35,6 +35,7 @@ enum ConstraintType {
 };
 
 
+
 // ------------------------------
 // 索引结构体 (对应 .tid 文件)
 // ------------------------------
@@ -45,6 +46,7 @@ struct IndexBlock {
     char field[128];       // 索引字段名
     char index_file[256];  // 索引数据文件路径（如 "D:/DBMS_ROOT/data/db1/table1_name_idx.ix"）
 };
+
 
 // ------------------------------
 // 完整性约束结构体 (对应 .tic 文件)
@@ -83,7 +85,6 @@ struct TableBlock {
     char tid[256];        // 索引文件路径（占位）
     qint64 crtime;        // 创建时间（Unix时间戳）
     qint64 mtime;         // 修改时间（初始等于创建时间）
-    // 以下字段暂留空（索引和完整性约束）
 
 };
 
