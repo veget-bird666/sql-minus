@@ -2,6 +2,7 @@
 #define WIDGET_H
 
 #include <QWidget>
+#include "server.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -26,5 +27,6 @@ private slots:
 
 private:
     Ui::Widget *ui;
+    Server *server;
 };
 #endif // WIDGET_H
