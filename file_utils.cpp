@@ -4,6 +4,7 @@
 #include <QDir>
 #include <QDebug>
 #include "structures.h"
+#include "table_operations.h"
 
 
 QString root_path = "D:/DBMS_ROOT";
@@ -172,4 +173,128 @@ void FileUtil::deleteDatabaseDirectory(const QString& dbName) {
     if (!dbDir.removeRecursively()) {
         throw std::runtime_error("无法删除数据库文件夹");
     }
+}
+
+
+
+// 生成表文件路径（如 D:/DBMS_ROOT/data/db1/table1.tdf）
+QString FileUtil::generateTableFilePath(const QString& dbName, const QString& tableName, const QString& suffix) {
+    return QString("D:/DBMS_ROOT/data/%1/%2.%3").arg(dbName, tableName, suffix);
+}
+
+// 创建所有表文件
+void FileUtil::createTableFiles(const CreateTableOperation* operation, const QString& dbName) {
+
+    // 1. 校验表名是否已存在
+    std::vector<TableBlock> tables = readAllTableBlocks(dbName);
+    QString tableName = QString::fromUtf8(operation->table_block.name);
+    for (const auto& table : tables) {
+        if (QString::fromUtf8(table.name) == tableName) {
+            throw std::runtime_error("表已存在: " + tableName.toStdString());
+        }
+    }
+
+    // 2. 生成文件路径
+    QString tdfPath = generateTableFilePath(dbName, tableName, "tdf");
+    QString trdPath = generateTableFilePath(dbName, tableName, "trd");
+
+    // 3. 创建数据库文件夹（如果不存在）
+    QDir dbDir(QString("D:/DBMS_ROOT/data/%1").arg(dbName));
+    if (!dbDir.exists()) dbDir.mkpath(".");
+
+    // 4. 创建表定义文件 (.tdf) 并写入字段信息
+    QFile tdfFile(tdfPath);
+    if (!tdfFile.open(QIODevice::WriteOnly)) {
+        throw std::runtime_error("无法创建表定义文件: " + tdfPath.toStdString());
+    }
+    for (const FieldBlock& field : operation->field_blocks) {
+        tdfFile.write(reinterpret_cast<const char*>(&field), sizeof(FieldBlock));
+    }
+    tdfFile.close();
+
+    // 5. 创建空记录文件 (.trd)
+    QFile trdFile(trdPath);
+    if (!trdFile.open(QIODevice::WriteOnly)) {
+        throw std::runtime_error("无法创建记录文件: " + trdPath.toStdString());
+    }
+    trdFile.close();
+
+    // 6. 更新表描述文件 (.tb)
+    appendTableRecord(operation->table_block, dbName);
+
+
+    // 7. 创建完整性约束文件 (.tic)
+    QString ticPath = generateTableFilePath(dbName, tableName, "tic");
+    createIntegrityFile(operation->constraints, ticPath);
+
+    // 8. 创建索引描述文件 (.tid) 和索引数据文件 (.ix)
+    QString tidPath = generateTableFilePath(dbName, tableName, "tid");
+    QFile tidFile(tidPath);
+    if (!tidFile.open(QIODevice::WriteOnly)) {
+        throw std::runtime_error("无法创建索引描述文件: " + tidPath.toStdString());
+    }
+    for (const IndexBlock& index : operation->indexes) {
+        // 写入索引描述
+        tidFile.write(reinterpret_cast<const char*>(&index), sizeof(IndexBlock));
+        // 创建索引数据文件
+        createIndexFile(index);
+    }
+    tidFile.close();
+}
+
+
+// 追加表记录到 [数据库名].tb
+void FileUtil::appendTableRecord(const TableBlock& block, const QString& dbName) {
+    QString tbPath = QString("D:/DBMS_ROOT/data/%1/%2.tb").arg(dbName, dbName);
+    QFile file(tbPath);
+    if (!file.open(QIODevice::Append)) {
+        throw std::runtime_error("无法打开表描述文件: " + tbPath.toStdString());
+    }
+    file.write(reinterpret_cast<const char*>(&block), sizeof(TableBlock));
+    file.close();
+}
+
+
+
+// 读取所有表记录（用于校验表名）
+std::vector<TableBlock> FileUtil::readAllTableBlocks(const QString& dbName) {
+    std::vector<TableBlock> blocks;
+    QString tbPath = QString("D:/DBMS_ROOT/data/%1/%2.tb").arg(dbName, dbName);
+    QFile file(tbPath);
+    if (!file.exists()) return blocks;
+
+    if (!file.open(QIODevice::ReadOnly)) {
+        throw std::runtime_error("无法读取表描述文件: " + tbPath.toStdString());
+    }
+
+    QByteArray data = file.readAll();
+    for (qint64 i = 0; i < data.size(); i += sizeof(TableBlock)) {
+        TableBlock block;
+        memcpy(&block, data.constData() + i, sizeof(TableBlock));
+        blocks.push_back(block);
+    }
+    return blocks;
+}
+
+
+
+// 创建完整性约束文件
+void FileUtil::createIntegrityFile(const vector<IntegrityConstraint>& constraints, const QString& ticPath) {
+    QFile ticFile(ticPath);
+    if (!ticFile.open(QIODevice::WriteOnly)) {
+        throw std::runtime_error("无法创建完整性文件: " + ticPath.toStdString());
+    }
+    for (const IntegrityConstraint& constraint : constraints) {
+        ticFile.write(reinterpret_cast<const char*>(&constraint), sizeof(IntegrityConstraint));
+    }
+    ticFile.close();
+}
+
+// 创建索引数据文件（空文件，仅占位）
+void FileUtil::createIndexFile(const IndexBlock& index) {
+    QFile ixFile(QString::fromUtf8(index.index_file));
+    if (!ixFile.open(QIODevice::WriteOnly)) {
+        throw std::runtime_error("无法创建索引数据文件: " + QString::fromUtf8(index.index_file).toStdString());
+    }
+    ixFile.close();
 }
