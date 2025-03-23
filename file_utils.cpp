@@ -182,27 +182,19 @@ QString FileUtil::generateTableFilePath(const QString& dbName, const QString& ta
     return QString("D:/DBMS_ROOT/data/%1/%2.%3").arg(dbName, tableName, suffix);
 }
 
+
+
 // 创建所有表文件
 void FileUtil::createTableFiles(const CreateTableOperation* operation, const QString& dbName) {
 
-    // 1. 校验表名是否已存在
-    std::vector<TableBlock> tables = readAllTableBlocks(dbName);
+    // 1. 生成表名
     QString tableName = QString::fromUtf8(operation->table_block.name);
-    for (const auto& table : tables) {
-        if (QString::fromUtf8(table.name) == tableName) {
-            throw std::runtime_error("表已存在: " + tableName.toStdString());
-        }
-    }
 
     // 2. 生成文件路径
     QString tdfPath = generateTableFilePath(dbName, tableName, "tdf");
     QString trdPath = generateTableFilePath(dbName, tableName, "trd");
 
-    // 3. 创建数据库文件夹（如果不存在）
-    QDir dbDir(QString("D:/DBMS_ROOT/data/%1").arg(dbName));
-    if (!dbDir.exists()) dbDir.mkpath(".");
-
-    // 4. 创建表定义文件 (.tdf) 并写入字段信息
+    // 3. 创建表定义文件 ([表名].tdf) 并写入字段信息
     QFile tdfFile(tdfPath);
     if (!tdfFile.open(QIODevice::WriteOnly)) {
         throw std::runtime_error("无法创建表定义文件: " + tdfPath.toStdString());
@@ -212,22 +204,22 @@ void FileUtil::createTableFiles(const CreateTableOperation* operation, const QSt
     }
     tdfFile.close();
 
-    // 5. 创建空记录文件 (.trd)
+    // 4. 创建空记录文件 ([表名].trd)
     QFile trdFile(trdPath);
     if (!trdFile.open(QIODevice::WriteOnly)) {
         throw std::runtime_error("无法创建记录文件: " + trdPath.toStdString());
     }
     trdFile.close();
 
-    // 6. 更新表描述文件 (.tb)
+    // 5. 更新表描述文件 ([数据库名].tb)
     appendTableRecord(operation->table_block, dbName);
 
 
-    // 7. 创建完整性约束文件 (.tic)
+    // 6. 创建完整性约束文件 ([表名].tic)
     QString ticPath = generateTableFilePath(dbName, tableName, "tic");
     createIntegrityFile(operation->constraints, ticPath);
 
-    // 8. 创建索引描述文件 (.tid) 和索引数据文件 (.ix)
+    // 7. 创建索引描述文件 ([表名].tid) 和索引数据文件 ([表名].ix)
     QString tidPath = generateTableFilePath(dbName, tableName, "tid");
     QFile tidFile(tidPath);
     if (!tidFile.open(QIODevice::WriteOnly)) {
@@ -275,8 +267,6 @@ std::vector<TableBlock> FileUtil::readAllTableBlocks(const QString& dbName) {
     }
     return blocks;
 }
-
-
 
 // 创建完整性约束文件
 void FileUtil::createIntegrityFile(const vector<IntegrityConstraint>& constraints, const QString& ticPath) {
