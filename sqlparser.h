@@ -2,6 +2,7 @@
 #define SQLPARSER_H
 #include <QString>
 #include "database_operations.h"
+#include "structures.h"
 
 // 手写实现SQL语句解析器
 class SqlParser
@@ -11,6 +12,7 @@ public:
 
     // 解析SQL语句
     static Operation* parse(const QString& sql);
+    static QList<FieldBlock>  extractFields(const QString& tableDefinition);
 
 
 };
