@@ -5,17 +5,19 @@
 #include "widget.h"
 extern Widget* widget;
 
+QString DatabaseManager::currentDB = "";
+
 // 管理创建数据库的操作
 void DatabaseManager::createDatabase(const CreateDatabaseOperation* operation) {
 
     QString dbName = operation->dbName;
 
-    // 参数校验（示例：名称长度限制）
+    // 参数校验
     if (dbName.length() > 128) {
         throw std::invalid_argument("Database name too long");
     }
 
-    // 创建数据库记录
+    // 创建记录
     DatabaseBlock block;
     memset(&block, 0, sizeof(DatabaseBlock));
 
@@ -100,6 +102,31 @@ void DatabaseManager::showDatabases(){
     } catch (const std::exception& e) {
         qCritical() << "读取数据库列表失败:" << e.what();
     }
+}
+
+void DatabaseManager::useDatabase(const UseDatabaseOperation* operation){
+    QString dbName = operation->dbName;
+    try {
+        // 1. 检查是否为系统数据库（如 Ruanko）
+        // if (dbName == "Ruanko") {
+        //     throw std::runtime_error("系统数据库不可删除");
+        // }
+
+        // 2. 检查数据库是否存在
+        std::vector<DatabaseBlock> databases = FileUtil::readAllDatabaseBlocks();
+        bool exists = std::any_of(databases.begin(), databases.end(),
+                                  [&dbName](const DatabaseBlock& block) {
+                                      return QString::fromUtf8(block.name) == dbName;
+                                  });
+        if (!exists) {
+            throw std::runtime_error("数据库不存在");
+        }
+        widget->showMessage("数据库使用成功" + dbName);
+    } catch (const std::exception& e) {
+        widget->showMessage("数据库使用失败：" + QString::fromStdString(e.what()));
+    }
+
+    currentDB = operation->dbName;
 }
 
 
