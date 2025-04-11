@@ -15,3 +15,8 @@ void DropDatabaseOperation::execute(){
 void ShowDatabasesOperation::execute(){
     DatabaseManager::showDatabases();
 }
+
+// 使用数据库操作
+void UseDatabaseOperation::execute(){
+    DatabaseManager::useDatabase(this);
+}
