@@ -98,7 +98,15 @@ struct FieldBlock {
     qint32 param;         // 类型参数（如VARCHAR长度）
     qint64 mtime;         // 最后修改时间
     qint32 integrities;   // 完整性约束（占位）
+
+    // 外键约束相关
+    char ref_table[128];  // 引用的表名 (外键约束)
+    char ref_field[128];  // 引用的字段名 (外键约束)
+
+    // 检查约束相关
+    char check_condition[256];  // 检查约束条件
 };
+
 #pragma pack(pop)
 
 
