@@ -36,5 +36,12 @@ public:
     void execute() override;
 };
 
+// 使用数据库
+class UseDatabaseOperation : public DatabaseOperation {
+public:
+    explicit UseDatabaseOperation(const QString& dbName) :DatabaseOperation(dbName) {}
+    void execute() override;
+};
+
 
 #endif // DATABASE_OPERATIONS_H
