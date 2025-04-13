@@ -7,7 +7,6 @@ D:/Git/sql-minus/build/Desktop_Qt_6_5_3_MSVC2019_64bit-Debug/sql_minus_autogen/E
   D:/Git/sql-minus/server.h \
   D:/Git/sql-minus/sqlparser.h \
   D:/Git/sql-minus/structures.h \
-  D:/Git/sql-minus/table_operations.h \
   D:/QT/6.5.3/msvc2019_64/include/QtCore/QString \
   D:/QT/6.5.3/msvc2019_64/include/QtCore/QtGlobal \
   D:/QT/6.5.3/msvc2019_64/include/QtCore/q20memory.h \

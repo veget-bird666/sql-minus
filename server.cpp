@@ -11,7 +11,7 @@ Server::Server(QObject *parent) : QTcpServer(parent) {
 }
 
 
-QString Server::databaselist(){
+QString Server::databaselist() {
     QString message;
     try {
         std::vector<DatabaseBlock> databases = FileUtil::readAllDatabaseBlocks();
@@ -19,17 +19,16 @@ QString Server::databaselist(){
             qDebug() << "数据库名称:" << db.name
                      << "类型:" << (db.type ? "系统" : "用户")
                      << "路径:" << db.filename;
-
-        }
-        for (const auto& db : databases) {
             QString dbName = QString::fromUtf8(db.name);
-            message+=dbName+'\n';
+            message += dbName + '\n';
         }
+        message += '\n'; // 添加结束符
     } catch (const std::exception& e) {
         qCritical() << "读取数据库列表失败:" << e.what();
     }
     return message;
 }
+
 
 void Server::incomingConnection(qintptr socketDescriptor) {
     clientSocket = new QTcpSocket(this);
