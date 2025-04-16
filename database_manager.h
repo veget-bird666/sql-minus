@@ -9,7 +9,6 @@ class DatabaseManager : Manager{
 private:
 
 public:
-    static QString currentDB;
     static void createDatabase(const CreateDatabaseOperation* operation);
     static void dropDatabase(const DropDatabaseOperation* operation);
     static void showDatabases();
