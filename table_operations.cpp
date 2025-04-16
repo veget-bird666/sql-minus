@@ -1,8 +1,7 @@
 #include "table_operations.h"
 #include "table_manager.h"
-#include "database_manager.h"
 #include <QTime>
-
+extern QString currentDB;
 // 创建数据库操作
 CreateTableOperation::CreateTableOperation(QString tableName, QList<FieldBlock> fields) {
     // 获取表定义文件
@@ -21,7 +20,7 @@ CreateTableOperation::CreateTableOperation(QString tableName, QList<FieldBlock> 
         // }
         //fieldBlock.integrities;
     }
-    dbName = DatabaseManager::currentDB;
+    dbName = currentDB;
 
     // 创建字段
     TableBlock newTableBlock;
@@ -30,9 +29,12 @@ CreateTableOperation::CreateTableOperation(QString tableName, QList<FieldBlock> 
     // 填充字段
     strncpy(newTableBlock.name, tableName.toUtf8().constData(), 128);
     newTableBlock.record_num = 0;
-    newTableBlock.field_num = 0;//fields.size();
+    newTableBlock.field_num = fields.size();
+
     strncpy(newTableBlock.tdf, ("D:/DBMS_ROOT/data/" + dbName + "/" + tableName + ".tdf").toUtf8().constData(), 256);
     strncpy(newTableBlock.trd, ("D:/DBMS_ROOT/data/" + dbName + "/" + tableName + ".trd").toUtf8().constData(), 256);
+    strncpy(newTableBlock.tic, ("D:/DBMS_ROOT/data/" + dbName + "/" + tableName + ".tic").toUtf8().constData(), 256);
+    strncpy(newTableBlock.tid, ("D:/DBMS_ROOT/data/" + dbName + "/" + tableName + ".tid").toUtf8().constData(), 256);
     newTableBlock.crtime = QDateTime::currentSecsSinceEpoch();
     newTableBlock.mtime = newTableBlock.crtime;
     table_block = newTableBlock;
@@ -92,6 +94,41 @@ void CreateTableOperation::extractIntegrityConstraints(const FieldBlock& field) 
     // 这里可以添加处理其他类型约束的逻辑
     // 例如：if (field.integrities & CT_PRIMARY_KEY) {...}
 }
+
+
+// 显示所有表的操作类
+void ShowTablesOperation::execute() {
+    TableManager::showTables();
+}
+
+
+// 删除表的操作类
+void DropTableOperation::execute(){
+    TableManager::dropTable(this);
+}
+
+// 描述表的操作类
+void DescribeTableOperation::execute() {
+    TableManager::describeTable(this);
+}
+
+
+// 添加字段操作类
+void AddColumnOperation::execute() {
+    TableManager::addColumn(this);
+}
+
+// 删除字段操作类
+void DropColumnOperation::execute() {
+    TableManager::dropColumn(this);
+}
+
+// 修改字段操作类
+void ModifyColumnOperation::execute() {
+    TableManager::modifyColumn(this);
+}
+
+
 
 // // 表定义文件结构体（对应 [表名].tdf 文件）
 // struct FieldBlock {
