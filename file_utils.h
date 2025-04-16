@@ -36,6 +36,15 @@ public:
     // 读取数据库的所有表记录（用于校验表名重复）
     static std::vector<TableBlock> readAllTableBlocks(const QString& dbName);
 
+    // 删除表的操作
+    static void dropTable(const QString& dbName, const QString& tableName);
+
+    // 更新表定义文件
+    static void updateTableDefinition(const QString& dbName, const QString& tableName,
+                                      const std::vector<FieldBlock>& newFields);
+
+    // 读取表字段定义
+    static std::vector<FieldBlock> readTableFields(const QString& dbName, const QString& tableName);
 
 private:
 
