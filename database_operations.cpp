@@ -1,6 +1,8 @@
 #include "database_operations.h"
 #include "database_manager.h"
 
+extern QString currentDB;
+
 // 创建数据库操作
 void CreateDatabaseOperation::execute(){
     DatabaseManager::createDatabase(this);
