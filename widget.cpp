@@ -2,6 +2,8 @@
 #include "./ui_widget.h"
 #include "operation.h"
 #include "sqlparser.h"
+extern QString currentDB;
+using namespace std;
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
@@ -31,8 +33,8 @@ void Widget::on_executeButton_clicked()
 
         Operation* o = SqlParser::parse(sql_command);
         o->execute();
-    } catch (...) {
-        showMessage("输入指令格式错误");
+    } catch (const std::exception& e) {
+        showMessage("输入指令错误: " + QString::fromStdString(e.what()));
     }
 }
 
