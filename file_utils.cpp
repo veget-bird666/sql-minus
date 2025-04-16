@@ -5,7 +5,7 @@
 #include <QDebug>
 #include "structures.h"
 #include "table_operations.h"
-
+extern QString currentDB;
 
 QString root_path = "D:/DBMS_ROOT";
 
@@ -247,11 +247,11 @@ void FileUtil::appendTableRecord(const TableBlock& block, const QString& dbName)
 }
 
 
-
-// 读取所有表记录（用于校验表名）
+// 读取所有表记录
 std::vector<TableBlock> FileUtil::readAllTableBlocks(const QString& dbName) {
     std::vector<TableBlock> blocks;
     QString tbPath = QString("D:/DBMS_ROOT/data/%1/%2.tb").arg(dbName, dbName);
+
     QFile file(tbPath);
     if (!file.exists()) return blocks;
 
@@ -259,12 +259,23 @@ std::vector<TableBlock> FileUtil::readAllTableBlocks(const QString& dbName) {
         throw std::runtime_error("无法读取表描述文件: " + tbPath.toStdString());
     }
 
+    // 读取整个文件
     QByteArray data = file.readAll();
-    for (qint64 i = 0; i < data.size(); i += sizeof(TableBlock)) {
+    file.close();
+
+    // 确保数据大小是 TableBlock 的整数倍
+    if (data.size() % sizeof(TableBlock) != 0) {
+        throw std::runtime_error("表描述文件损坏: 大小不匹配");
+    }
+
+    // 解析每个 TableBlock
+    int blockCount = data.size() / sizeof(TableBlock);
+    for (int i = 0; i < blockCount; i++) {
         TableBlock block;
-        memcpy(&block, data.constData() + i, sizeof(TableBlock));
+        memcpy(&block, data.constData() + i * sizeof(TableBlock), sizeof(TableBlock));
         blocks.push_back(block);
     }
+
     return blocks;
 }
 
@@ -288,3 +299,118 @@ void FileUtil::createIndexFile(const IndexBlock& index) {
     }
     ixFile.close();
 }
+
+
+// 删除表的操作
+void FileUtil::dropTable(const QString& dbName, const QString& tableName) {
+    try {
+        // 1. 读取所有表记录
+        std::vector<TableBlock> tables = readAllTableBlocks(dbName);
+
+        // 2. 查找目标表（正确的方式）
+        bool tableExists = false;
+        TableBlock targetBlock;
+        for (const auto& block : tables) {
+            if (QString::fromUtf8(block.name) == tableName) {
+                tableExists = true;
+                targetBlock = block;
+                break;
+            }
+        }
+
+        if (!tableExists) {
+            throw std::runtime_error("表不存在: " + tableName.toStdString());
+        }
+
+        // 3. 删除物理文件
+        QString tdfPath = QString::fromUtf8(targetBlock.tdf);
+        QString trdPath = QString::fromUtf8(targetBlock.trd);
+        QString ticPath = QString::fromUtf8(targetBlock.tic);
+        QString tidPath = QString::fromUtf8(targetBlock.tid);
+
+        QFile::remove(tdfPath);
+        QFile::remove(trdPath);
+        QFile::remove(ticPath);
+        QFile::remove(tidPath);
+
+        // 4. 从内存集合中移除该表
+        tables.erase(
+            std::remove_if(tables.begin(), tables.end(),
+                           [&tableName](const TableBlock& block) {
+                               return QString::fromUtf8(block.name) == tableName;
+                           }),
+            tables.end()
+            );
+
+        // 5. 更新.tb文件
+        QString tbFilePath = QString("D:/DBMS_ROOT/data/%1/%2.tb").arg(dbName, dbName);
+        QFile tbFile(tbFilePath);
+        if (!tbFile.open(QIODevice::WriteOnly)) {
+            throw std::runtime_error("无法更新表描述文件");
+        }
+
+        for (const auto& block : tables) {
+            tbFile.write(reinterpret_cast<const char*>(&block), sizeof(TableBlock));
+        }
+        tbFile.close();
+
+        // 6. 删除索引文件
+        QFile tidFile(tidPath);
+        if (tidFile.open(QIODevice::ReadOnly)) {
+            QByteArray data = tidFile.readAll();
+            const char* ptr = data.constData();
+            while (ptr < data.constData() + data.size()) {
+                IndexBlock index;
+                memcpy(&index, ptr, sizeof(IndexBlock));
+                QFile::remove(QString::fromUtf8(index.index_file));
+                ptr += sizeof(IndexBlock);
+            }
+            tidFile.close();
+        }
+
+    } catch (const std::exception& e) {
+        qCritical() << "删除表失败:" << e.what();
+        throw;
+    }
+}
+
+// 更新表定义文件
+void FileUtil::updateTableDefinition(const QString& dbName, const QString& tableName,
+                                     const std::vector<FieldBlock>& newFields) {
+    QString tdfPath = generateTableFilePath(dbName, tableName, "tdf");
+    QFile tdfFile(tdfPath);
+
+    if (!tdfFile.open(QIODevice::WriteOnly)) {
+        throw std::runtime_error("无法更新表定义文件");
+    }
+
+    for (const auto& field : newFields) {
+        tdfFile.write(reinterpret_cast<const char*>(&field), sizeof(FieldBlock));
+    }
+
+    tdfFile.close();
+
+}
+
+// 读取表的所有字段
+std::vector<FieldBlock> FileUtil::readTableFields(const QString& dbName, const QString& tableName) {
+    std::vector<FieldBlock> fields;
+    QString tdfPath = QString("D:/DBMS_ROOT/data/%1/%2.tdf").arg(dbName, tableName);
+
+    QFile tdfFile(tdfPath);
+    if (!tdfFile.open(QIODevice::ReadOnly)) {
+        throw std::runtime_error("无法打开表定义文件: " + tdfPath.toStdString());
+    }
+
+    QByteArray data = tdfFile.readAll();
+    tdfFile.close();
+
+    int blockCount = data.size() / sizeof(FieldBlock);
+    for (int i = 0; i < blockCount; i++) {
+        FieldBlock field;
+        memcpy(&field, data.constData() + i * sizeof(FieldBlock), sizeof(FieldBlock));
+        fields.push_back(field);
+    }
+    return fields;
+}
+
