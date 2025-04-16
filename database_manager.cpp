@@ -5,7 +5,7 @@
 #include "widget.h"
 extern Widget* widget;
 
-QString DatabaseManager::currentDB = "";
+extern QString currentDB;
 
 // 管理创建数据库的操作
 void DatabaseManager::createDatabase(const CreateDatabaseOperation* operation) {
@@ -81,20 +81,26 @@ void DatabaseManager::showDatabases(){
 
         }
 
-        // 格式化数据库列表
-        QString message = "数据库列表：\n";
+        // 格式化输出
+        QString message = QString("+----------------------+------------+\n"
+                                  "| Database Name        | Type       |\n"
+                                  "+----------------------+------------+\n");
+        // 表头
+        message += QString("| %1 | %2 |\n")
+                       .arg("名称", 20, ' ') // 名称列宽度为20
+                       .arg("类型", 20, ' '); // 类型列宽度为10
+
         for (const auto& db : databases) {
             QString dbName = QString::fromUtf8(db.name);
             QString dbType = db.type ? "系统数据库" : "用户数据库";
-            QString dbPath = QString::fromUtf8(db.filename);
-            QDateTime createTime = QDateTime::fromSecsSinceEpoch(db.crtime);
 
-            message += QString("名称: %1\n类型: %2\n路径: %3\n创建时间: %4\n")
-                           .arg(dbName)
-                           .arg(dbType)
-                           .arg(dbPath)
-                           .arg(createTime.toString("yyyy-MM-dd HH:mm:ss"));
+            // 每行内容，强制对齐
+            message += QString("| %1 | %2 |\n")
+                           .arg(dbName.leftJustified(20, ' ')) // 名称列对齐
+                           .arg(dbType.leftJustified(10, ' ')); // 类型列对齐
         }
+
+        message+="+----------------------+------------+\n";
 
         // 显示消息
         widget->showMessage(message);
