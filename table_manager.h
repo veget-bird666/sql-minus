@@ -6,8 +6,13 @@
 class TableManager : Manager{
 public:
     static void createTable(const CreateTableOperation* operation);
-    // static void dropTable(const DropTableOperation* operation);
+    static void showTables();
+    static void dropTable(const DropTableOperation* operation);
 
+    static void addColumn(AddColumnOperation* operation);
+    static void dropColumn(DropColumnOperation* operation);
+    static void modifyColumn(ModifyColumnOperation* operation);
+    static void describeTable(const DescribeTableOperation* operation);
 };
 
 #endif // TABLE_MANAGER_H
