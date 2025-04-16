@@ -78,11 +78,11 @@ struct DatabaseBlock {
 struct TableBlock {
     char name[128];       // 表名称
     qint32 record_num;    // 记录数（初始为0）
-    qint32 field_num;     // 字段数（初始为0）
+    qint32 field_num;     // 字段数
     char tdf[256];        // 表定义文件路径（如 D:/DBMS_ROOT/data/db1/table1.tdf）
     char trd[256];        // 记录文件路径（如 D:/DBMS_ROOT/data/db1/table1.trd）
-    char tic[256];        // 完整性文件路径（占位）
-    char tid[256];        // 索引文件路径（占位）
+    char tic[256];        // 完整性文件路径
+    char tid[256];        // 索引文件路径
     qint64 crtime;        // 创建时间（Unix时间戳）
     qint64 mtime;         // 修改时间（初始等于创建时间）
 
@@ -97,7 +97,7 @@ struct FieldBlock {
     qint32 type;          // 字段类型（如0=INTEGER, 1=VARCHAR）
     qint32 param;         // 类型参数（如VARCHAR长度）
     qint64 mtime;         // 最后修改时间
-    qint32 integrities;   // 完整性约束（占位）
+    qint32 integrities;   // 完整性约束
 
     // 外键约束相关
     char ref_table[128];  // 引用的表名 (外键约束)
