@@ -3,7 +3,7 @@
 #include "table_operations.h"
 #include <QRegularExpression>
 #include "structures.h"
-
+extern QString currentDB;
 
 SqlParser::SqlParser() {}
 
@@ -57,6 +57,30 @@ Operation* SqlParser::parse(const QString& sql) {
         return new UseDatabaseOperation(dbName); // 返回对应的操作对象
     }
 
+    // 匹配DROP TABLE
+    static QRegularExpression dropTableRegex(
+        "^DROP\\s+TABLE\\s+(\\w+)\\s*;$",
+        QRegularExpression::CaseInsensitiveOption | QRegularExpression::MultilineOption
+        );
+
+    QRegularExpressionMatch dropTableMatch = dropTableRegex.match(sql);
+    if (dropTableMatch.hasMatch()) {
+        QString tableName = dropTableMatch.captured(1).trimmed();
+        QString dbName = currentDB;
+        return new DropTableOperation(dbName, tableName);
+    }
+
+    // 匹配 SHOW TABLES
+    static QRegularExpression showTablesRegex(
+        "^\\s*SHOW\\s+TABLES\\s*;?\\s*$",
+        QRegularExpression::CaseInsensitiveOption
+        );
+
+    QRegularExpressionMatch showTablesMatch = showTablesRegex.match(sql);
+    if (showTablesMatch.hasMatch()) {
+        return new ShowTablesOperation();
+    }
+
     // 匹配 CREATE TABLE
     static QRegularExpression createTableRegex(
         "^CREATE\\s+TABLE\\s+(\\w+)\\s*\\((.+)\\)\\s*;$",
@@ -74,6 +98,62 @@ Operation* SqlParser::parse(const QString& sql) {
         // 返回一个包含表名和字段信息的操作对象
         return new CreateTableOperation(tableName, fields);
     }
+
+
+    // 匹配 ALTER TABLE ADD COLUMN
+    static QRegularExpression addColumnRegex(
+        "^ALTER\\s+TABLE\\s+(\\w+)\\s+ADD\\s+COLUMN\\s+(.+);$",
+        QRegularExpression::CaseInsensitiveOption
+        );
+
+    QRegularExpressionMatch addMatch = addColumnRegex.match(sql);
+    if (addMatch.hasMatch()) {
+        QString tableName = addMatch.captured(1).trimmed();
+        QList<FieldBlock> fields = extractFields(addMatch.captured(2));
+        if (fields.size() != 1) throw std::invalid_argument("只能添加一个字段");
+        return new AddColumnOperation(currentDB, tableName, fields.first());
+    }
+
+    // 匹配 ALTER TABLE DROP COLUMN
+    static QRegularExpression dropColumnRegex(
+        "^ALTER\\s+TABLE\\s+(\\w+)\\s+DROP\\s+COLUMN\\s+(\\w+);$",
+        QRegularExpression::CaseInsensitiveOption
+        );
+
+    QRegularExpressionMatch dropColMatch = dropColumnRegex.match(sql);
+    if (dropColMatch.hasMatch()) {
+        QString tableName = dropColMatch.captured(1).trimmed();
+        QString columnName = dropColMatch.captured(2).trimmed();
+        return new DropColumnOperation(currentDB, tableName, columnName);
+    }
+
+    // 匹配 ALTER TABLE MODIFY COLUMN
+    static QRegularExpression modifyColumnRegex(
+        "^ALTER\\s+TABLE\\s+(\\w+)\\s+MODIFY\\s+COLUMN\\s+(.+);$",
+        QRegularExpression::CaseInsensitiveOption
+        );
+
+    QRegularExpressionMatch modifyMatch = modifyColumnRegex.match(sql);
+    if (modifyMatch.hasMatch()) {
+        QString tableName = modifyMatch.captured(1).trimmed();
+        QList<FieldBlock> fields = extractFields(modifyMatch.captured(2));
+        if (fields.size() != 1) throw std::invalid_argument("只能修改一个字段");
+        return new ModifyColumnOperation(currentDB, tableName,
+                                         QString::fromUtf8(fields.first().name), fields.first());
+    }
+
+    // 匹配 DESC 或 DESCRIBE 表名
+    static QRegularExpression descTableRegex(
+        "^\\s*(DESC|DESCRIBE)\\s+(\\w+)\\s*;?\\s*$",
+        QRegularExpression::CaseInsensitiveOption
+        );
+    QRegularExpressionMatch descMatch = descTableRegex.match(sql);
+    if (descMatch.hasMatch()) {
+        QString tableName = descMatch.captured(2).trimmed();
+        return new DescribeTableOperation(currentDB, tableName);
+    }
+
+
 
     // 如果都未匹配，抛出异常
     throw std::invalid_argument("输入指令格式错误");
@@ -96,48 +176,48 @@ QList<FieldBlock> SqlParser::extractFields(const QString& tableDefinition) {
         strncpy(field.name, fieldName.toStdString().c_str(), sizeof(field.name));
 
         // 类型映射
-        if (fieldType == "INTEGER") {
+        if (fieldType == "INTEGER" || fieldType == "int") {
             field.type = DT_INTEGER;
-        } else if (fieldType == "BOOL") {
+        } else if (fieldType == "BOOL" || fieldType == "bool") {
             field.type = DT_BOOL;
-        } else if (fieldType == "DOUBLE") {
+        } else if (fieldType == "DOUBLE" || fieldType == "double") {
             field.type = DT_DOUBLE;
-        } else if (fieldType == "VARCHAR") {
+        } else if (fieldType == "VARCHAR" || fieldType == "varchar") {
             field.type = DT_VARCHAR;
             field.param = match.captured(4).toInt(); // VARCHAR 长度
-        } else if (fieldType == "DATETIME") {
+        } else if (fieldType == "DATETIME" || fieldType == "datatime") {
             field.type = DT_DATETIME;
         }
 
         QString constraint = match.captured(5).trimmed();
 
         // 解析 PRIMARY KEY
-        if (constraint.contains("PRIMARY KEY")) {
+        if (constraint.contains("PRIMARY KEY") || constraint.contains("primary key")) {
             field.integrities |= CT_PRIMARY_KEY;
         }
 
         // 解析 NOT NULL
-        if (constraint.contains("NOT NULL")) {
+        if (constraint.contains("NOT NULL") || constraint.contains("not null")) {
             field.integrities |= CT_NOT_NULL;
         }
 
         // 解析 UNIQUE
-        if (constraint.contains("UNIQUE")) {
+        if (constraint.contains("UNIQUE") || constraint.contains("unique")) {
             field.integrities |= CT_UNIQUE;
         }
 
         // 解析 DEFAULT
-        if (constraint.startsWith("DEFAULT")) {
+        if (constraint.startsWith("DEFAULT") || constraint.startsWith("default")) {
             field.integrities |= CT_DEFAULT;
         }
 
         // 解析 AUTO_INCREMENT
-        if (constraint.contains("AUTO_INCREMENT")) {
+        if (constraint.contains("AUTO_INCREMENT") || constraint.contains("auto_increment")) {
             field.integrities |= CT_IDENTITY;
         }
 
         // 解析 FOREIGN KEY
-        if (constraint.contains("FOREIGN KEY")) {
+        if (constraint.contains("FOREIGN KEY") || constraint.contains("foreign key")) {
             field.integrities |= CT_FOREIGN_KEY;
             QString refTable = match.captured(7).trimmed();
             QString refField = match.captured(8).trimmed();
@@ -146,7 +226,7 @@ QList<FieldBlock> SqlParser::extractFields(const QString& tableDefinition) {
         }
 
         // 解析 CHECK
-        if (constraint.contains("CHECK")) {
+        if (constraint.contains("CHECK") || constraint.contains("check")) {
             field.integrities |= CT_CHECK;
             QString checkCondition = match.captured(9).trimmed();
             strncpy(field.check_condition, checkCondition.toStdString().c_str(), sizeof(field.check_condition));
