@@ -3,7 +3,8 @@
 #include "operation.h"
 #include "sqlparser.h"
 #include "server.h"
-
+extern QString currentDB;
+using namespace std;
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
@@ -39,7 +40,7 @@ void Widget::on_executeButton_clicked()
         o->execute();
     } catch (...) {
         showMessage("SQL command is not correct.");
-    }*/
+    }
 }
 
 // 粘贴文本操作

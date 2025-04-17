@@ -1,0 +1,4 @@
+#ifndef TUPLE_MANAGER_H
+#define TUPLE_MANAGER_H
+
+#endif // TUPLE_MANAGER_H

@@ -40,7 +40,14 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         sqlparser.cpp
         table_manager.cpp
         table_operations.cpp
+<<<<<<< HEAD
         server.h server.cpp
+=======
+        tuple_operations.h
+        tuple_manager.h
+        tuple_operations.cpp
+        tuple_manager.cpp
+>>>>>>> df3e6bfcce8b15dde33d777b672edd3d91ae1004
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET sql_minus APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
