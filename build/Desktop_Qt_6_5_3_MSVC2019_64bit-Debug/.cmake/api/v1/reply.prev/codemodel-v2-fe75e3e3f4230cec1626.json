@@ -1,0 +1,79 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-5f37b56a9a2d622351d1.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "test_of_sqlminus",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "test_of_sqlminus::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-test_of_sqlminus-Debug-d0a29bffefdcb7f0b46c.json",
+					"name" : "test_of_sqlminus",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "test_of_sqlminus_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-test_of_sqlminus_autogen-Debug-1a50eeb5897297725653.json",
+					"name" : "test_of_sqlminus_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "test_of_sqlminus_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-test_of_sqlminus_autogen_timestamp_deps-Debug-a002fc32add576f2e896.json",
+					"name" : "test_of_sqlminus_autogen_timestamp_deps",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "D:/Git/sql-minus/build/Desktop_Qt_6_5_3_MSVC2019_64bit-Debug",
+		"source" : "D:/Git/sql-minus"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

@@ -13,7 +13,8 @@ class Server : public QTcpServer {
 public:
     Server(QObject *parent = nullptr);
 
-    QString databaselist();
+    QString databaseAndTableList();
+    void setCurrentDatabase(const QString &dbName);
 
     void incomingConnection(qintptr socketDescriptor) override;
 

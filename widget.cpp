@@ -42,11 +42,11 @@ void Widget::on_executeButton_clicked()
         showMessage("SQL command is not correct.");
     }
 }
-
+*/
+}
 // 粘贴文本操作
 void Widget::showMessage(QString message){
     ui->informationEdit->append(message);
     server->clientSocket->write(message.toUtf8());
     server->clientSocket->flush();
-
 }

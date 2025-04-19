@@ -171,7 +171,7 @@ CMAKE_PROJECT_HOMEPAGE_URL:STATIC=
 CMAKE_PROJECT_INCLUDE_BEFORE:FILEPATH=D:/Git/sql-minus/build/Desktop_Qt_6_5_3_MSVC2019_64bit-Debug/.qtc/package-manager/auto-setup.cmake
 
 //Value Computed by CMake
-CMAKE_PROJECT_NAME:STATIC=sql_minus
+CMAKE_PROJECT_NAME:STATIC=test_of_sqlminus
 
 //Value Computed by CMake
 CMAKE_PROJECT_VERSION:STATIC=0.1
@@ -333,13 +333,13 @@ sql_minus_IS_TOP_LEVEL:STATIC=ON
 sql_minus_SOURCE_DIR:STATIC=D:/Git/sql-minus
 
 //Value Computed by CMake
-untitled_BINARY_DIR:STATIC=D:/Git/sql-minus/build/Desktop_Qt_6_5_3_MSVC2019_64bit-Debug/client
+test_of_sqlminus_BINARY_DIR:STATIC=D:/Git/sql-minus/build/Desktop_Qt_6_5_3_MSVC2019_64bit-Debug
 
 //Value Computed by CMake
-untitled_IS_TOP_LEVEL:STATIC=OFF
+test_of_sqlminus_IS_TOP_LEVEL:STATIC=ON
 
 //Value Computed by CMake
-untitled_SOURCE_DIR:STATIC=D:/Git/sql-minus/client
+test_of_sqlminus_SOURCE_DIR:STATIC=D:/Git/sql-minus
 
 
 ########################
@@ -456,7 +456,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_MT
 CMAKE_MT-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=2
+CMAKE_NUMBER_OF_MAKEFILES:INTERNAL=1
 //Platform information initialized
 CMAKE_PLATFORM_INFO_INITIALIZED:INTERNAL=1
 //noop for ranlib

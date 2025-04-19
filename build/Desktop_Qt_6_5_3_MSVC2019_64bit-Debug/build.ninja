@@ -11,7 +11,7 @@
 # =============================================================================
 
 # =============================================================================
-# Project: sql_minus
+# Project: test_of_sqlminus
 # Configurations: Debug
 # =============================================================================
 
@@ -41,132 +41,141 @@ include CMakeFiles\rules.ninja
 
 cmake_ninja_workdir = D$:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\
 # =============================================================================
-# Object build statements for EXECUTABLE target sql_minus
+# Object build statements for EXECUTABLE target test_of_sqlminus
 
 
 #############################################
-# Order-only phony target for sql_minus
+# Order-only phony target for test_of_sqlminus
 
-build cmake_object_order_depends_target_sql_minus: phony || sql_minus_autogen sql_minus_autogen\mocs_compilation.cpp sql_minus_autogen\timestamp sql_minus_autogen_timestamp_deps
+build cmake_object_order_depends_target_test_of_sqlminus: phony || test_of_sqlminus_autogen test_of_sqlminus_autogen\mocs_compilation.cpp test_of_sqlminus_autogen\timestamp test_of_sqlminus_autogen_timestamp_deps
 
-build CMakeFiles\sql_minus.dir\sql_minus_autogen\mocs_compilation.cpp.obj: CXX_COMPILER__sql_minus_unscanned_Debug D$:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\sql_minus_autogen\mocs_compilation.cpp || cmake_object_order_depends_target_sql_minus
+build CMakeFiles\test_of_sqlminus.dir\test_of_sqlminus_autogen\mocs_compilation.cpp.obj: CXX_COMPILER__test_of_sqlminus_unscanned_Debug D$:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\test_of_sqlminus_autogen\mocs_compilation.cpp || cmake_object_order_depends_target_test_of_sqlminus
   DEFINES = -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64
   FLAGS = -DQT_QML_DEBUG /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -std:c++17 -MDd -Zc:__cplusplus -permissive- -utf-8
-  INCLUDES = -ID:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\sql_minus_autogen\include -external:ID:\QT\6.5.3\msvc2019_64\include\QtCore -external:ID:\QT\6.5.3\msvc2019_64\include -external:ID:\QT\6.5.3\msvc2019_64\mkspecs\win32-msvc -external:ID:\QT\6.5.3\msvc2019_64\include\QtWidgets -external:ID:\QT\6.5.3\msvc2019_64\include\QtGui -external:ID:\QT\6.5.3\msvc2019_64\include\QtNetwork -external:W0
-  OBJECT_DIR = CMakeFiles\sql_minus.dir
-  OBJECT_FILE_DIR = CMakeFiles\sql_minus.dir\sql_minus_autogen
-  TARGET_COMPILE_PDB = CMakeFiles\sql_minus.dir\
-  TARGET_PDB = sql_minus.pdb
+  INCLUDES = -ID:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\test_of_sqlminus_autogen\include -external:ID:\QT\6.5.3\msvc2019_64\include\QtCore -external:ID:\QT\6.5.3\msvc2019_64\include -external:ID:\QT\6.5.3\msvc2019_64\mkspecs\win32-msvc -external:ID:\QT\6.5.3\msvc2019_64\include\QtWidgets -external:ID:\QT\6.5.3\msvc2019_64\include\QtGui -external:ID:\QT\6.5.3\msvc2019_64\include\QtNetwork -external:W0
+  OBJECT_DIR = CMakeFiles\test_of_sqlminus.dir
+  OBJECT_FILE_DIR = CMakeFiles\test_of_sqlminus.dir\test_of_sqlminus_autogen
+  TARGET_COMPILE_PDB = CMakeFiles\test_of_sqlminus.dir\
+  TARGET_PDB = test_of_sqlminus.pdb
 
-build CMakeFiles\sql_minus.dir\main.cpp.obj: CXX_COMPILER__sql_minus_unscanned_Debug D$:\Git\sql-minus\main.cpp || cmake_object_order_depends_target_sql_minus
+build CMakeFiles\test_of_sqlminus.dir\main.cpp.obj: CXX_COMPILER__test_of_sqlminus_unscanned_Debug D$:\Git\sql-minus\main.cpp || cmake_object_order_depends_target_test_of_sqlminus
   DEFINES = -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64
   FLAGS = -DQT_QML_DEBUG /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -std:c++17 -MDd -Zc:__cplusplus -permissive- -utf-8
-  INCLUDES = -ID:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\sql_minus_autogen\include -external:ID:\QT\6.5.3\msvc2019_64\include\QtCore -external:ID:\QT\6.5.3\msvc2019_64\include -external:ID:\QT\6.5.3\msvc2019_64\mkspecs\win32-msvc -external:ID:\QT\6.5.3\msvc2019_64\include\QtWidgets -external:ID:\QT\6.5.3\msvc2019_64\include\QtGui -external:ID:\QT\6.5.3\msvc2019_64\include\QtNetwork -external:W0
-  OBJECT_DIR = CMakeFiles\sql_minus.dir
-  OBJECT_FILE_DIR = CMakeFiles\sql_minus.dir
-  TARGET_COMPILE_PDB = CMakeFiles\sql_minus.dir\
-  TARGET_PDB = sql_minus.pdb
+  INCLUDES = -ID:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\test_of_sqlminus_autogen\include -external:ID:\QT\6.5.3\msvc2019_64\include\QtCore -external:ID:\QT\6.5.3\msvc2019_64\include -external:ID:\QT\6.5.3\msvc2019_64\mkspecs\win32-msvc -external:ID:\QT\6.5.3\msvc2019_64\include\QtWidgets -external:ID:\QT\6.5.3\msvc2019_64\include\QtGui -external:ID:\QT\6.5.3\msvc2019_64\include\QtNetwork -external:W0
+  OBJECT_DIR = CMakeFiles\test_of_sqlminus.dir
+  OBJECT_FILE_DIR = CMakeFiles\test_of_sqlminus.dir
+  TARGET_COMPILE_PDB = CMakeFiles\test_of_sqlminus.dir\
+  TARGET_PDB = test_of_sqlminus.pdb
 
-build CMakeFiles\sql_minus.dir\widget.cpp.obj: CXX_COMPILER__sql_minus_unscanned_Debug D$:\Git\sql-minus\widget.cpp || cmake_object_order_depends_target_sql_minus
+build CMakeFiles\test_of_sqlminus.dir\widget.cpp.obj: CXX_COMPILER__test_of_sqlminus_unscanned_Debug D$:\Git\sql-minus\widget.cpp || cmake_object_order_depends_target_test_of_sqlminus
   DEFINES = -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64
   FLAGS = -DQT_QML_DEBUG /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -std:c++17 -MDd -Zc:__cplusplus -permissive- -utf-8
-  INCLUDES = -ID:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\sql_minus_autogen\include -external:ID:\QT\6.5.3\msvc2019_64\include\QtCore -external:ID:\QT\6.5.3\msvc2019_64\include -external:ID:\QT\6.5.3\msvc2019_64\mkspecs\win32-msvc -external:ID:\QT\6.5.3\msvc2019_64\include\QtWidgets -external:ID:\QT\6.5.3\msvc2019_64\include\QtGui -external:ID:\QT\6.5.3\msvc2019_64\include\QtNetwork -external:W0
-  OBJECT_DIR = CMakeFiles\sql_minus.dir
-  OBJECT_FILE_DIR = CMakeFiles\sql_minus.dir
-  TARGET_COMPILE_PDB = CMakeFiles\sql_minus.dir\
-  TARGET_PDB = sql_minus.pdb
+  INCLUDES = -ID:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\test_of_sqlminus_autogen\include -external:ID:\QT\6.5.3\msvc2019_64\include\QtCore -external:ID:\QT\6.5.3\msvc2019_64\include -external:ID:\QT\6.5.3\msvc2019_64\mkspecs\win32-msvc -external:ID:\QT\6.5.3\msvc2019_64\include\QtWidgets -external:ID:\QT\6.5.3\msvc2019_64\include\QtGui -external:ID:\QT\6.5.3\msvc2019_64\include\QtNetwork -external:W0
+  OBJECT_DIR = CMakeFiles\test_of_sqlminus.dir
+  OBJECT_FILE_DIR = CMakeFiles\test_of_sqlminus.dir
+  TARGET_COMPILE_PDB = CMakeFiles\test_of_sqlminus.dir\
+  TARGET_PDB = test_of_sqlminus.pdb
 
-build CMakeFiles\sql_minus.dir\database_manager.cpp.obj: CXX_COMPILER__sql_minus_unscanned_Debug D$:\Git\sql-minus\database_manager.cpp || cmake_object_order_depends_target_sql_minus
+build CMakeFiles\test_of_sqlminus.dir\operation.cpp.obj: CXX_COMPILER__test_of_sqlminus_unscanned_Debug D$:\Git\sql-minus\operation.cpp || cmake_object_order_depends_target_test_of_sqlminus
   DEFINES = -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64
   FLAGS = -DQT_QML_DEBUG /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -std:c++17 -MDd -Zc:__cplusplus -permissive- -utf-8
-  INCLUDES = -ID:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\sql_minus_autogen\include -external:ID:\QT\6.5.3\msvc2019_64\include\QtCore -external:ID:\QT\6.5.3\msvc2019_64\include -external:ID:\QT\6.5.3\msvc2019_64\mkspecs\win32-msvc -external:ID:\QT\6.5.3\msvc2019_64\include\QtWidgets -external:ID:\QT\6.5.3\msvc2019_64\include\QtGui -external:ID:\QT\6.5.3\msvc2019_64\include\QtNetwork -external:W0
-  OBJECT_DIR = CMakeFiles\sql_minus.dir
-  OBJECT_FILE_DIR = CMakeFiles\sql_minus.dir
-  TARGET_COMPILE_PDB = CMakeFiles\sql_minus.dir\
-  TARGET_PDB = sql_minus.pdb
+  INCLUDES = -ID:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\test_of_sqlminus_autogen\include -external:ID:\QT\6.5.3\msvc2019_64\include\QtCore -external:ID:\QT\6.5.3\msvc2019_64\include -external:ID:\QT\6.5.3\msvc2019_64\mkspecs\win32-msvc -external:ID:\QT\6.5.3\msvc2019_64\include\QtWidgets -external:ID:\QT\6.5.3\msvc2019_64\include\QtGui -external:ID:\QT\6.5.3\msvc2019_64\include\QtNetwork -external:W0
+  OBJECT_DIR = CMakeFiles\test_of_sqlminus.dir
+  OBJECT_FILE_DIR = CMakeFiles\test_of_sqlminus.dir
+  TARGET_COMPILE_PDB = CMakeFiles\test_of_sqlminus.dir\
+  TARGET_PDB = test_of_sqlminus.pdb
 
-build CMakeFiles\sql_minus.dir\database_operations.cpp.obj: CXX_COMPILER__sql_minus_unscanned_Debug D$:\Git\sql-minus\database_operations.cpp || cmake_object_order_depends_target_sql_minus
+build CMakeFiles\test_of_sqlminus.dir\manager.cpp.obj: CXX_COMPILER__test_of_sqlminus_unscanned_Debug D$:\Git\sql-minus\manager.cpp || cmake_object_order_depends_target_test_of_sqlminus
   DEFINES = -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64
   FLAGS = -DQT_QML_DEBUG /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -std:c++17 -MDd -Zc:__cplusplus -permissive- -utf-8
-  INCLUDES = -ID:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\sql_minus_autogen\include -external:ID:\QT\6.5.3\msvc2019_64\include\QtCore -external:ID:\QT\6.5.3\msvc2019_64\include -external:ID:\QT\6.5.3\msvc2019_64\mkspecs\win32-msvc -external:ID:\QT\6.5.3\msvc2019_64\include\QtWidgets -external:ID:\QT\6.5.3\msvc2019_64\include\QtGui -external:ID:\QT\6.5.3\msvc2019_64\include\QtNetwork -external:W0
-  OBJECT_DIR = CMakeFiles\sql_minus.dir
-  OBJECT_FILE_DIR = CMakeFiles\sql_minus.dir
-  TARGET_COMPILE_PDB = CMakeFiles\sql_minus.dir\
-  TARGET_PDB = sql_minus.pdb
+  INCLUDES = -ID:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\test_of_sqlminus_autogen\include -external:ID:\QT\6.5.3\msvc2019_64\include\QtCore -external:ID:\QT\6.5.3\msvc2019_64\include -external:ID:\QT\6.5.3\msvc2019_64\mkspecs\win32-msvc -external:ID:\QT\6.5.3\msvc2019_64\include\QtWidgets -external:ID:\QT\6.5.3\msvc2019_64\include\QtGui -external:ID:\QT\6.5.3\msvc2019_64\include\QtNetwork -external:W0
+  OBJECT_DIR = CMakeFiles\test_of_sqlminus.dir
+  OBJECT_FILE_DIR = CMakeFiles\test_of_sqlminus.dir
+  TARGET_COMPILE_PDB = CMakeFiles\test_of_sqlminus.dir\
+  TARGET_PDB = test_of_sqlminus.pdb
 
-build CMakeFiles\sql_minus.dir\file_utils.cpp.obj: CXX_COMPILER__sql_minus_unscanned_Debug D$:\Git\sql-minus\file_utils.cpp || cmake_object_order_depends_target_sql_minus
+build CMakeFiles\test_of_sqlminus.dir\sqlparser.cpp.obj: CXX_COMPILER__test_of_sqlminus_unscanned_Debug D$:\Git\sql-minus\sqlparser.cpp || cmake_object_order_depends_target_test_of_sqlminus
   DEFINES = -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64
   FLAGS = -DQT_QML_DEBUG /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -std:c++17 -MDd -Zc:__cplusplus -permissive- -utf-8
-  INCLUDES = -ID:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\sql_minus_autogen\include -external:ID:\QT\6.5.3\msvc2019_64\include\QtCore -external:ID:\QT\6.5.3\msvc2019_64\include -external:ID:\QT\6.5.3\msvc2019_64\mkspecs\win32-msvc -external:ID:\QT\6.5.3\msvc2019_64\include\QtWidgets -external:ID:\QT\6.5.3\msvc2019_64\include\QtGui -external:ID:\QT\6.5.3\msvc2019_64\include\QtNetwork -external:W0
-  OBJECT_DIR = CMakeFiles\sql_minus.dir
-  OBJECT_FILE_DIR = CMakeFiles\sql_minus.dir
-  TARGET_COMPILE_PDB = CMakeFiles\sql_minus.dir\
-  TARGET_PDB = sql_minus.pdb
+  INCLUDES = -ID:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\test_of_sqlminus_autogen\include -external:ID:\QT\6.5.3\msvc2019_64\include\QtCore -external:ID:\QT\6.5.3\msvc2019_64\include -external:ID:\QT\6.5.3\msvc2019_64\mkspecs\win32-msvc -external:ID:\QT\6.5.3\msvc2019_64\include\QtWidgets -external:ID:\QT\6.5.3\msvc2019_64\include\QtGui -external:ID:\QT\6.5.3\msvc2019_64\include\QtNetwork -external:W0
+  OBJECT_DIR = CMakeFiles\test_of_sqlminus.dir
+  OBJECT_FILE_DIR = CMakeFiles\test_of_sqlminus.dir
+  TARGET_COMPILE_PDB = CMakeFiles\test_of_sqlminus.dir\
+  TARGET_PDB = test_of_sqlminus.pdb
 
-build CMakeFiles\sql_minus.dir\operation.cpp.obj: CXX_COMPILER__sql_minus_unscanned_Debug D$:\Git\sql-minus\operation.cpp || cmake_object_order_depends_target_sql_minus
+build CMakeFiles\test_of_sqlminus.dir\file_utils.cpp.obj: CXX_COMPILER__test_of_sqlminus_unscanned_Debug D$:\Git\sql-minus\file_utils.cpp || cmake_object_order_depends_target_test_of_sqlminus
   DEFINES = -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64
   FLAGS = -DQT_QML_DEBUG /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -std:c++17 -MDd -Zc:__cplusplus -permissive- -utf-8
-  INCLUDES = -ID:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\sql_minus_autogen\include -external:ID:\QT\6.5.3\msvc2019_64\include\QtCore -external:ID:\QT\6.5.3\msvc2019_64\include -external:ID:\QT\6.5.3\msvc2019_64\mkspecs\win32-msvc -external:ID:\QT\6.5.3\msvc2019_64\include\QtWidgets -external:ID:\QT\6.5.3\msvc2019_64\include\QtGui -external:ID:\QT\6.5.3\msvc2019_64\include\QtNetwork -external:W0
-  OBJECT_DIR = CMakeFiles\sql_minus.dir
-  OBJECT_FILE_DIR = CMakeFiles\sql_minus.dir
-  TARGET_COMPILE_PDB = CMakeFiles\sql_minus.dir\
-  TARGET_PDB = sql_minus.pdb
+  INCLUDES = -ID:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\test_of_sqlminus_autogen\include -external:ID:\QT\6.5.3\msvc2019_64\include\QtCore -external:ID:\QT\6.5.3\msvc2019_64\include -external:ID:\QT\6.5.3\msvc2019_64\mkspecs\win32-msvc -external:ID:\QT\6.5.3\msvc2019_64\include\QtWidgets -external:ID:\QT\6.5.3\msvc2019_64\include\QtGui -external:ID:\QT\6.5.3\msvc2019_64\include\QtNetwork -external:W0
+  OBJECT_DIR = CMakeFiles\test_of_sqlminus.dir
+  OBJECT_FILE_DIR = CMakeFiles\test_of_sqlminus.dir
+  TARGET_COMPILE_PDB = CMakeFiles\test_of_sqlminus.dir\
+  TARGET_PDB = test_of_sqlminus.pdb
 
-build CMakeFiles\sql_minus.dir\sqlparser.cpp.obj: CXX_COMPILER__sql_minus_unscanned_Debug D$:\Git\sql-minus\sqlparser.cpp || cmake_object_order_depends_target_sql_minus
+build CMakeFiles\test_of_sqlminus.dir\table_operations.cpp.obj: CXX_COMPILER__test_of_sqlminus_unscanned_Debug D$:\Git\sql-minus\table_operations.cpp || cmake_object_order_depends_target_test_of_sqlminus
   DEFINES = -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64
   FLAGS = -DQT_QML_DEBUG /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -std:c++17 -MDd -Zc:__cplusplus -permissive- -utf-8
-  INCLUDES = -ID:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\sql_minus_autogen\include -external:ID:\QT\6.5.3\msvc2019_64\include\QtCore -external:ID:\QT\6.5.3\msvc2019_64\include -external:ID:\QT\6.5.3\msvc2019_64\mkspecs\win32-msvc -external:ID:\QT\6.5.3\msvc2019_64\include\QtWidgets -external:ID:\QT\6.5.3\msvc2019_64\include\QtGui -external:ID:\QT\6.5.3\msvc2019_64\include\QtNetwork -external:W0
-  OBJECT_DIR = CMakeFiles\sql_minus.dir
-  OBJECT_FILE_DIR = CMakeFiles\sql_minus.dir
-  TARGET_COMPILE_PDB = CMakeFiles\sql_minus.dir\
-  TARGET_PDB = sql_minus.pdb
+  INCLUDES = -ID:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\test_of_sqlminus_autogen\include -external:ID:\QT\6.5.3\msvc2019_64\include\QtCore -external:ID:\QT\6.5.3\msvc2019_64\include -external:ID:\QT\6.5.3\msvc2019_64\mkspecs\win32-msvc -external:ID:\QT\6.5.3\msvc2019_64\include\QtWidgets -external:ID:\QT\6.5.3\msvc2019_64\include\QtGui -external:ID:\QT\6.5.3\msvc2019_64\include\QtNetwork -external:W0
+  OBJECT_DIR = CMakeFiles\test_of_sqlminus.dir
+  OBJECT_FILE_DIR = CMakeFiles\test_of_sqlminus.dir
+  TARGET_COMPILE_PDB = CMakeFiles\test_of_sqlminus.dir\
+  TARGET_PDB = test_of_sqlminus.pdb
 
-build CMakeFiles\sql_minus.dir\table_manager.cpp.obj: CXX_COMPILER__sql_minus_unscanned_Debug D$:\Git\sql-minus\table_manager.cpp || cmake_object_order_depends_target_sql_minus
+build CMakeFiles\test_of_sqlminus.dir\database_operations.cpp.obj: CXX_COMPILER__test_of_sqlminus_unscanned_Debug D$:\Git\sql-minus\database_operations.cpp || cmake_object_order_depends_target_test_of_sqlminus
   DEFINES = -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64
   FLAGS = -DQT_QML_DEBUG /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -std:c++17 -MDd -Zc:__cplusplus -permissive- -utf-8
-  INCLUDES = -ID:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\sql_minus_autogen\include -external:ID:\QT\6.5.3\msvc2019_64\include\QtCore -external:ID:\QT\6.5.3\msvc2019_64\include -external:ID:\QT\6.5.3\msvc2019_64\mkspecs\win32-msvc -external:ID:\QT\6.5.3\msvc2019_64\include\QtWidgets -external:ID:\QT\6.5.3\msvc2019_64\include\QtGui -external:ID:\QT\6.5.3\msvc2019_64\include\QtNetwork -external:W0
-  OBJECT_DIR = CMakeFiles\sql_minus.dir
-  OBJECT_FILE_DIR = CMakeFiles\sql_minus.dir
-  TARGET_COMPILE_PDB = CMakeFiles\sql_minus.dir\
-  TARGET_PDB = sql_minus.pdb
+  INCLUDES = -ID:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\test_of_sqlminus_autogen\include -external:ID:\QT\6.5.3\msvc2019_64\include\QtCore -external:ID:\QT\6.5.3\msvc2019_64\include -external:ID:\QT\6.5.3\msvc2019_64\mkspecs\win32-msvc -external:ID:\QT\6.5.3\msvc2019_64\include\QtWidgets -external:ID:\QT\6.5.3\msvc2019_64\include\QtGui -external:ID:\QT\6.5.3\msvc2019_64\include\QtNetwork -external:W0
+  OBJECT_DIR = CMakeFiles\test_of_sqlminus.dir
+  OBJECT_FILE_DIR = CMakeFiles\test_of_sqlminus.dir
+  TARGET_COMPILE_PDB = CMakeFiles\test_of_sqlminus.dir\
+  TARGET_PDB = test_of_sqlminus.pdb
 
-build CMakeFiles\sql_minus.dir\table_operations.cpp.obj: CXX_COMPILER__sql_minus_unscanned_Debug D$:\Git\sql-minus\table_operations.cpp || cmake_object_order_depends_target_sql_minus
+build CMakeFiles\test_of_sqlminus.dir\table_manager.cpp.obj: CXX_COMPILER__test_of_sqlminus_unscanned_Debug D$:\Git\sql-minus\table_manager.cpp || cmake_object_order_depends_target_test_of_sqlminus
   DEFINES = -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64
   FLAGS = -DQT_QML_DEBUG /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -std:c++17 -MDd -Zc:__cplusplus -permissive- -utf-8
-  INCLUDES = -ID:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\sql_minus_autogen\include -external:ID:\QT\6.5.3\msvc2019_64\include\QtCore -external:ID:\QT\6.5.3\msvc2019_64\include -external:ID:\QT\6.5.3\msvc2019_64\mkspecs\win32-msvc -external:ID:\QT\6.5.3\msvc2019_64\include\QtWidgets -external:ID:\QT\6.5.3\msvc2019_64\include\QtGui -external:ID:\QT\6.5.3\msvc2019_64\include\QtNetwork -external:W0
-  OBJECT_DIR = CMakeFiles\sql_minus.dir
-  OBJECT_FILE_DIR = CMakeFiles\sql_minus.dir
-  TARGET_COMPILE_PDB = CMakeFiles\sql_minus.dir\
-  TARGET_PDB = sql_minus.pdb
+  INCLUDES = -ID:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\test_of_sqlminus_autogen\include -external:ID:\QT\6.5.3\msvc2019_64\include\QtCore -external:ID:\QT\6.5.3\msvc2019_64\include -external:ID:\QT\6.5.3\msvc2019_64\mkspecs\win32-msvc -external:ID:\QT\6.5.3\msvc2019_64\include\QtWidgets -external:ID:\QT\6.5.3\msvc2019_64\include\QtGui -external:ID:\QT\6.5.3\msvc2019_64\include\QtNetwork -external:W0
+  OBJECT_DIR = CMakeFiles\test_of_sqlminus.dir
+  OBJECT_FILE_DIR = CMakeFiles\test_of_sqlminus.dir
+  TARGET_COMPILE_PDB = CMakeFiles\test_of_sqlminus.dir\
+  TARGET_PDB = test_of_sqlminus.pdb
 
-build CMakeFiles\sql_minus.dir\server.cpp.obj: CXX_COMPILER__sql_minus_unscanned_Debug D$:\Git\sql-minus\server.cpp || cmake_object_order_depends_target_sql_minus
+build CMakeFiles\test_of_sqlminus.dir\database_manager.cpp.obj: CXX_COMPILER__test_of_sqlminus_unscanned_Debug D$:\Git\sql-minus\database_manager.cpp || cmake_object_order_depends_target_test_of_sqlminus
   DEFINES = -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64
   FLAGS = -DQT_QML_DEBUG /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -std:c++17 -MDd -Zc:__cplusplus -permissive- -utf-8
-  INCLUDES = -ID:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\sql_minus_autogen\include -external:ID:\QT\6.5.3\msvc2019_64\include\QtCore -external:ID:\QT\6.5.3\msvc2019_64\include -external:ID:\QT\6.5.3\msvc2019_64\mkspecs\win32-msvc -external:ID:\QT\6.5.3\msvc2019_64\include\QtWidgets -external:ID:\QT\6.5.3\msvc2019_64\include\QtGui -external:ID:\QT\6.5.3\msvc2019_64\include\QtNetwork -external:W0
-  OBJECT_DIR = CMakeFiles\sql_minus.dir
-  OBJECT_FILE_DIR = CMakeFiles\sql_minus.dir
-  TARGET_COMPILE_PDB = CMakeFiles\sql_minus.dir\
-  TARGET_PDB = sql_minus.pdb
+  INCLUDES = -ID:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\test_of_sqlminus_autogen\include -external:ID:\QT\6.5.3\msvc2019_64\include\QtCore -external:ID:\QT\6.5.3\msvc2019_64\include -external:ID:\QT\6.5.3\msvc2019_64\mkspecs\win32-msvc -external:ID:\QT\6.5.3\msvc2019_64\include\QtWidgets -external:ID:\QT\6.5.3\msvc2019_64\include\QtGui -external:ID:\QT\6.5.3\msvc2019_64\include\QtNetwork -external:W0
+  OBJECT_DIR = CMakeFiles\test_of_sqlminus.dir
+  OBJECT_FILE_DIR = CMakeFiles\test_of_sqlminus.dir
+  TARGET_COMPILE_PDB = CMakeFiles\test_of_sqlminus.dir\
+  TARGET_PDB = test_of_sqlminus.pdb
+
+build CMakeFiles\test_of_sqlminus.dir\server.cpp.obj: CXX_COMPILER__test_of_sqlminus_unscanned_Debug D$:\Git\sql-minus\server.cpp || cmake_object_order_depends_target_test_of_sqlminus
+  DEFINES = -DQT_CORE_LIB -DQT_GUI_LIB -DQT_NETWORK_LIB -DQT_WIDGETS_LIB -DUNICODE -DWIN32 -DWIN64 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -D_UNICODE -D_WIN64
+  FLAGS = -DQT_QML_DEBUG /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -std:c++17 -MDd -Zc:__cplusplus -permissive- -utf-8
+  INCLUDES = -ID:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug\test_of_sqlminus_autogen\include -external:ID:\QT\6.5.3\msvc2019_64\include\QtCore -external:ID:\QT\6.5.3\msvc2019_64\include -external:ID:\QT\6.5.3\msvc2019_64\mkspecs\win32-msvc -external:ID:\QT\6.5.3\msvc2019_64\include\QtWidgets -external:ID:\QT\6.5.3\msvc2019_64\include\QtGui -external:ID:\QT\6.5.3\msvc2019_64\include\QtNetwork -external:W0
+  OBJECT_DIR = CMakeFiles\test_of_sqlminus.dir
+  OBJECT_FILE_DIR = CMakeFiles\test_of_sqlminus.dir
+  TARGET_COMPILE_PDB = CMakeFiles\test_of_sqlminus.dir\
+  TARGET_PDB = test_of_sqlminus.pdb
 
 
 # =============================================================================
-# Link build statements for EXECUTABLE target sql_minus
+# Link build statements for EXECUTABLE target test_of_sqlminus
 
 
 #############################################
-# Link the executable sql_minus.exe
+# Link the executable test_of_sqlminus.exe
 
-build sql_minus.exe: CXX_EXECUTABLE_LINKER__sql_minus_Debug CMakeFiles\sql_minus.dir\sql_minus_autogen\mocs_compilation.cpp.obj CMakeFiles\sql_minus.dir\main.cpp.obj CMakeFiles\sql_minus.dir\widget.cpp.obj CMakeFiles\sql_minus.dir\database_manager.cpp.obj CMakeFiles\sql_minus.dir\database_operations.cpp.obj CMakeFiles\sql_minus.dir\file_utils.cpp.obj CMakeFiles\sql_minus.dir\operation.cpp.obj CMakeFiles\sql_minus.dir\sqlparser.cpp.obj CMakeFiles\sql_minus.dir\table_manager.cpp.obj CMakeFiles\sql_minus.dir\table_operations.cpp.obj CMakeFiles\sql_minus.dir\server.cpp.obj | D$:\QT\6.5.3\msvc2019_64\lib\Qt6Widgetsd.lib D$:\QT\6.5.3\msvc2019_64\lib\Qt6Networkd.lib D$:\QT\6.5.3\msvc2019_64\lib\Qt6Guid.lib D$:\QT\6.5.3\msvc2019_64\lib\Qt6Cored.lib D$:\QT\6.5.3\msvc2019_64\lib\Qt6EntryPointd.lib || sql_minus_autogen sql_minus_autogen_timestamp_deps
+build test_of_sqlminus.exe: CXX_EXECUTABLE_LINKER__test_of_sqlminus_Debug CMakeFiles\test_of_sqlminus.dir\test_of_sqlminus_autogen\mocs_compilation.cpp.obj CMakeFiles\test_of_sqlminus.dir\main.cpp.obj CMakeFiles\test_of_sqlminus.dir\widget.cpp.obj CMakeFiles\test_of_sqlminus.dir\operation.cpp.obj CMakeFiles\test_of_sqlminus.dir\manager.cpp.obj CMakeFiles\test_of_sqlminus.dir\sqlparser.cpp.obj CMakeFiles\test_of_sqlminus.dir\file_utils.cpp.obj CMakeFiles\test_of_sqlminus.dir\table_operations.cpp.obj CMakeFiles\test_of_sqlminus.dir\database_operations.cpp.obj CMakeFiles\test_of_sqlminus.dir\table_manager.cpp.obj CMakeFiles\test_of_sqlminus.dir\database_manager.cpp.obj CMakeFiles\test_of_sqlminus.dir\server.cpp.obj | D$:\QT\6.5.3\msvc2019_64\lib\Qt6Widgetsd.lib D$:\QT\6.5.3\msvc2019_64\lib\Qt6Networkd.lib D$:\QT\6.5.3\msvc2019_64\lib\Qt6Guid.lib D$:\QT\6.5.3\msvc2019_64\lib\Qt6Cored.lib D$:\QT\6.5.3\msvc2019_64\lib\Qt6EntryPointd.lib || test_of_sqlminus_autogen test_of_sqlminus_autogen_timestamp_deps
   FLAGS = -DQT_QML_DEBUG /DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MDd
   LINK_FLAGS = /machine:x64 /debug /INCREMENTAL /subsystem:windows
   LINK_LIBRARIES = D:\QT\6.5.3\msvc2019_64\lib\Qt6Widgetsd.lib  D:\QT\6.5.3\msvc2019_64\lib\Qt6Networkd.lib  D:\QT\6.5.3\msvc2019_64\lib\Qt6Guid.lib  d3d11.lib  dxgi.lib  dxguid.lib  D:\QT\6.5.3\msvc2019_64\lib\Qt6Cored.lib  mpr.lib  userenv.lib  D:\QT\6.5.3\msvc2019_64\lib\Qt6EntryPointd.lib  shell32.lib  ws2_32.lib  kernel32.lib user32.lib gdi32.lib winspool.lib shell32.lib ole32.lib oleaut32.lib uuid.lib comdlg32.lib advapi32.lib
-  OBJECT_DIR = CMakeFiles\sql_minus.dir
+  OBJECT_DIR = CMakeFiles\test_of_sqlminus.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
-  TARGET_COMPILE_PDB = CMakeFiles\sql_minus.dir\
-  TARGET_FILE = sql_minus.exe
-  TARGET_IMPLIB = sql_minus.lib
-  TARGET_PDB = sql_minus.pdb
+  TARGET_COMPILE_PDB = CMakeFiles\test_of_sqlminus.dir\
+  TARGET_FILE = test_of_sqlminus.exe
+  TARGET_IMPLIB = test_of_sqlminus.lib
+  TARGET_PDB = test_of_sqlminus.pdb
 
 
 #############################################
@@ -224,37 +233,37 @@ build install\local: phony CMakeFiles\install\local.util
 
 
 #############################################
-# Utility command for sql_minus_autogen_timestamp_deps
+# Utility command for test_of_sqlminus_autogen_timestamp_deps
 
-build sql_minus_autogen_timestamp_deps: phony
-
-
-#############################################
-# Utility command for sql_minus_autogen
-
-build sql_minus_autogen: phony CMakeFiles\sql_minus_autogen sql_minus_autogen\include\ui_widget.h sql_minus_autogen\timestamp sql_minus_autogen\mocs_compilation.cpp sql_minus_autogen_timestamp_deps
+build test_of_sqlminus_autogen_timestamp_deps: phony
 
 
 #############################################
-# Custom command for sql_minus_autogen\timestamp
+# Utility command for test_of_sqlminus_autogen
 
-build sql_minus_autogen\timestamp sql_minus_autogen\mocs_compilation.cpp | ${cmake_ninja_workdir}sql_minus_autogen\timestamp ${cmake_ninja_workdir}sql_minus_autogen\mocs_compilation.cpp: CUSTOM_COMMAND D$:\QT\6.5.3\msvc2019_64\.\bin\moc.exe D$:\QT\6.5.3\msvc2019_64\.\bin\uic.exe || sql_minus_autogen_timestamp_deps
-  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D D:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug && D:\QT\Tools\CMake_64\bin\cmake.exe -E cmake_autogen D:/Git/sql-minus/build/Desktop_Qt_6_5_3_MSVC2019_64bit-Debug/CMakeFiles/sql_minus_autogen.dir/AutogenInfo.json Debug && D:\QT\Tools\CMake_64\bin\cmake.exe -E touch D:/Git/sql-minus/build/Desktop_Qt_6_5_3_MSVC2019_64bit-Debug/sql_minus_autogen/timestamp && D:\QT\Tools\CMake_64\bin\cmake.exe -E cmake_transform_depfile Ninja gccdepfile D:/Git/sql-minus D:/Git/sql-minus D:/Git/sql-minus/build/Desktop_Qt_6_5_3_MSVC2019_64bit-Debug D:/Git/sql-minus/build/Desktop_Qt_6_5_3_MSVC2019_64bit-Debug D:/Git/sql-minus/build/Desktop_Qt_6_5_3_MSVC2019_64bit-Debug/sql_minus_autogen/deps D:/Git/sql-minus/build/Desktop_Qt_6_5_3_MSVC2019_64bit-Debug/CMakeFiles/d/a28549e2c0ce581b375b8bd22e3ddc9a359629dd08350c9bc34b59b8b986579a.d"
-  DESC = Automatic MOC and UIC for target sql_minus
-  depfile = CMakeFiles\d\a28549e2c0ce581b375b8bd22e3ddc9a359629dd08350c9bc34b59b8b986579a.d
+build test_of_sqlminus_autogen: phony CMakeFiles\test_of_sqlminus_autogen test_of_sqlminus_autogen\include\ui_widget.h test_of_sqlminus_autogen\timestamp test_of_sqlminus_autogen\mocs_compilation.cpp test_of_sqlminus_autogen_timestamp_deps
+
+
+#############################################
+# Custom command for test_of_sqlminus_autogen\timestamp
+
+build test_of_sqlminus_autogen\timestamp test_of_sqlminus_autogen\mocs_compilation.cpp | ${cmake_ninja_workdir}test_of_sqlminus_autogen\timestamp ${cmake_ninja_workdir}test_of_sqlminus_autogen\mocs_compilation.cpp: CUSTOM_COMMAND D$:\QT\6.5.3\msvc2019_64\.\bin\moc.exe D$:\QT\6.5.3\msvc2019_64\.\bin\uic.exe || test_of_sqlminus_autogen_timestamp_deps
+  COMMAND = C:\WINDOWS\system32\cmd.exe /C "cd /D D:\Git\sql-minus\build\Desktop_Qt_6_5_3_MSVC2019_64bit-Debug && D:\QT\Tools\CMake_64\bin\cmake.exe -E cmake_autogen D:/Git/sql-minus/build/Desktop_Qt_6_5_3_MSVC2019_64bit-Debug/CMakeFiles/test_of_sqlminus_autogen.dir/AutogenInfo.json Debug && D:\QT\Tools\CMake_64\bin\cmake.exe -E touch D:/Git/sql-minus/build/Desktop_Qt_6_5_3_MSVC2019_64bit-Debug/test_of_sqlminus_autogen/timestamp && D:\QT\Tools\CMake_64\bin\cmake.exe -E cmake_transform_depfile Ninja gccdepfile D:/Git/sql-minus D:/Git/sql-minus D:/Git/sql-minus/build/Desktop_Qt_6_5_3_MSVC2019_64bit-Debug D:/Git/sql-minus/build/Desktop_Qt_6_5_3_MSVC2019_64bit-Debug D:/Git/sql-minus/build/Desktop_Qt_6_5_3_MSVC2019_64bit-Debug/test_of_sqlminus_autogen/deps D:/Git/sql-minus/build/Desktop_Qt_6_5_3_MSVC2019_64bit-Debug/CMakeFiles/d/f4dadf7f156cd96805214cc97a9add06022ad634a372940054a0bd2eeb3f95c0.d"
+  DESC = Automatic MOC and UIC for target test_of_sqlminus
+  depfile = CMakeFiles\d\f4dadf7f156cd96805214cc97a9add06022ad634a372940054a0bd2eeb3f95c0.d
   deps = gcc
   restat = 1
 
 
 #############################################
-# Phony custom command for CMakeFiles\sql_minus_autogen
+# Phony custom command for CMakeFiles\test_of_sqlminus_autogen
 
-build CMakeFiles\sql_minus_autogen sql_minus_autogen\include\ui_widget.h | ${cmake_ninja_workdir}CMakeFiles\sql_minus_autogen ${cmake_ninja_workdir}sql_minus_autogen\include\ui_widget.h: phony sql_minus_autogen\timestamp || sql_minus_autogen_timestamp_deps
+build CMakeFiles\test_of_sqlminus_autogen test_of_sqlminus_autogen\include\ui_widget.h | ${cmake_ninja_workdir}CMakeFiles\test_of_sqlminus_autogen ${cmake_ninja_workdir}test_of_sqlminus_autogen\include\ui_widget.h: phony test_of_sqlminus_autogen\timestamp || test_of_sqlminus_autogen_timestamp_deps
 
 # =============================================================================
 # Target aliases.
 
-build sql_minus: phony sql_minus.exe
+build test_of_sqlminus: phony test_of_sqlminus.exe
 
 # =============================================================================
 # Folder targets.
@@ -264,7 +273,7 @@ build sql_minus: phony sql_minus.exe
 #############################################
 # Folder: D:/Git/sql-minus/build/Desktop_Qt_6_5_3_MSVC2019_64bit-Debug
 
-build all: phony sql_minus.exe
+build all: phony test_of_sqlminus.exe
 
 # =============================================================================
 # Built-in targets
