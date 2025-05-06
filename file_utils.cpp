@@ -1,10 +1,14 @@
 #include "file_utils.h"
 #include <qdebug.h>
-#include <QFile>
 #include <QDir>
 #include <QDebug>
 #include "structures.h"
 #include "table_operations.h"
+#include <QFile>
+#include <QByteArray>
+#include <vector>
+#include <cstring>
+
 extern QString currentDB;
 
 QString root_path = "D:/DBMS_ROOT";
@@ -420,14 +424,93 @@ void FileUtil::appendDataRow(
     const QString& tableName,
     const DataRow& row
     ) {
-    // 1. 获取.trd文件路径
     QString trdPath = QString("D:/DBMS_ROOT/data/%1/%2.trd").arg(dbName, tableName);
 
-    // 2. 追加写入二进制数据
     QFile file(trdPath);
     if (!file.open(QIODevice::Append)) {
         throw std::runtime_error("Failed to open .trd file");
     }
-    file.write(reinterpret_cast<const char*>(&row), sizeof(DataRow) + row.fieldCount * sizeof(FieldValue));
+
+    // 先写入头部
+    file.write(reinterpret_cast<const char*>(&row.header), sizeof(DataRowHeader));
+
+    // 然后写入所有字段值
+    file.write(reinterpret_cast<const char*>(row.values.data()),
+               row.values.size() * sizeof(FieldValue));
+
     file.close();
+}
+
+void FileUtil::updateTableBlocks(const QString& dbName, const std::vector<TableBlock>& tables) {
+    // 1. 构造文件路径
+    QString tbPath = QString("D:/DBMS_ROOT/data/%1/%2.tb").arg(dbName, dbName);
+
+    // 2. 打开文件（覆盖模式）
+    QFile tbFile(tbPath);
+    if (!tbFile.open(QIODevice::WriteOnly)) {
+        throw std::runtime_error("Failed to open table metadata file for update");
+    }
+
+    // 3. 写入所有TableBlock
+    for (const auto& table : tables) {
+        if (tbFile.write(reinterpret_cast<const char*>(&table), sizeof(TableBlock)) != sizeof(TableBlock)) {
+            tbFile.close();
+            throw std::runtime_error("Failed to write table metadata");
+        }
+    }
+
+    // 4. 关闭文件
+    tbFile.close();
+}
+
+
+// 读取表中所有记录
+std::vector<DataRow> FileUtil::readAllDataRows(const QString& dbName, const QString& tableName) {
+    std::vector<DataRow> rows;
+    QString trdPath = generateTableFilePath(dbName, tableName, "trd");
+
+    QFile file(trdPath);
+    if (!file.exists()) {
+        throw std::runtime_error("Table data file not found");
+    }
+
+    if (!file.open(QIODevice::ReadOnly)) {
+        throw std::runtime_error("Failed to open table data file");
+    }
+
+    QByteArray data = file.readAll();
+    file.close();
+
+    const char* ptr = data.constData();
+    const char* endPtr = ptr + data.size();
+
+    while (ptr < endPtr) {
+        // 1. 读取头部
+        if (ptr + sizeof(DataRowHeader) > endPtr) {
+            throw std::runtime_error("Truncated data row header");
+        }
+
+        DataRow row;
+        memcpy(&row.header, ptr, sizeof(DataRowHeader));
+        ptr += sizeof(DataRowHeader);
+
+        // 2. 检查字段数是否合理
+        if (row.header.fieldCount <= 0 || row.header.fieldCount > 1000) {
+            throw std::runtime_error("Invalid field count in row");
+        }
+
+        // 3. 读取字段值
+        size_t valuesSize = row.header.fieldCount * sizeof(FieldValue);
+        if (ptr + valuesSize > endPtr) {
+            throw std::runtime_error("Truncated field values in row");
+        }
+
+        row.values.resize(row.header.fieldCount);
+        memcpy(row.values.data(), ptr, valuesSize);
+        ptr += valuesSize;
+
+        rows.push_back(row);
+    }
+
+    return rows;
 }
