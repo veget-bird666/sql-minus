@@ -414,3 +414,20 @@ std::vector<FieldBlock> FileUtil::readTableFields(const QString& dbName, const Q
     return fields;
 }
 
+// 插入数据
+void FileUtil::appendDataRow(
+    const QString& dbName,
+    const QString& tableName,
+    const DataRow& row
+    ) {
+    // 1. 获取.trd文件路径
+    QString trdPath = QString("D:/DBMS_ROOT/data/%1/%2.trd").arg(dbName, tableName);
+
+    // 2. 追加写入二进制数据
+    QFile file(trdPath);
+    if (!file.open(QIODevice::Append)) {
+        throw std::runtime_error("Failed to open .trd file");
+    }
+    file.write(reinterpret_cast<const char*>(&row), sizeof(DataRow) + row.fieldCount * sizeof(FieldValue));
+    file.close();
+}
