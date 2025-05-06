@@ -11,20 +11,26 @@ Server::Server(QObject *parent) : QTcpServer(parent) {
 }
 
 
-QString Server::databaselist() {
+QString Server::databaseAndTableList() {
     QString message;
     try {
-        std::vector<DatabaseBlock> databases = FileUtil::readAllDatabaseBlocks();
-        for (const auto& db : databases) {
-            qDebug() << "数据库名称:" << db.name
-                     << "类型:" << (db.type ? "系统" : "用户")
-                     << "路径:" << db.filename;
-            QString dbName = QString::fromUtf8(db.name);
-            message += dbName + '\n';
+        // 1. 先读取所有数据库
+        auto dbs = FileUtil::readAllDatabaseBlocks();
+        for (const auto& db : dbs) {
+            QString dbName = QString::fromStdString(db.name);  // 将 std::string 转换为 QString
+            message += dbName + "\n";
+
+            // 2. 读取该数据库下的所有表
+            QString dbNameQString = QString::fromStdString(db.name);  // 先转换为 QString
+            auto tables = FileUtil::readAllTableBlocks(dbNameQString);  // 传递 QString 而不是 std::string
+            for (const auto& tb : tables) {
+                QString tbName = QString::fromStdString(tb.name);  // 将 std::string 转换为 QString
+                message += "\t" + tbName + "\n";
+            }
         }
-        message += '\n'; // 添加结束符
+        message += "\n\n"; // 双换行表示结束
     } catch (const std::exception& e) {
-        qCritical() << "读取数据库列表失败:" << e.what();
+        message += QString("Error: %1\n\n").arg(e.what());
     }
     return message;
 }
@@ -44,7 +50,7 @@ void Server::readClientData() {
     QByteArray sqlComman = clientSocket->readAll();
     QString sqlCommand=QString::fromUtf8(sqlComman);
     if(sqlCommand=="1"){
-        clientSocket->write(databaselist().toUtf8());
+        clientSocket->write(databaseAndTableList().toUtf8());
     }
     else{
     qDebug() << "Received SQL command:" << sqlCommand;
@@ -63,3 +69,4 @@ void Server::handleClientDisconnect() {
     qDebug() << "Client disconnected!";
     clientSocket->deleteLater();
 }
+

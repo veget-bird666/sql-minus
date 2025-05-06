@@ -104,7 +104,7 @@ void TableManager::describeTable(const DescribeTableOperation* operation) {
     std::vector<FieldBlock> fields = FileUtil::readTableFields(dbName, tableName);
 
     // 格式化输出
-    QString message =
+    QString message ="DESCRIBE_RESPONSE\n"
         "+---------------------+------------+----------+----------------+\n"
         "| Field Name          | Type       | Length   | Constraints    |\n"
         "+---------------------+------------+----------+----------------+\n";
