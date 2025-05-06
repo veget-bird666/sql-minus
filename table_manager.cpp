@@ -121,10 +121,11 @@ void TableManager::describeTable(const DescribeTableOperation* operation) {
         }
 
         QString constraints;
-        if (field.integrities & CT_PRIMARY_KEY) constraints += "PK ";
-        if (field.integrities & CT_NOT_NULL)    constraints += "NN ";
-        if (field.integrities & CT_UNIQUE)      constraints += "UQ ";
-        if (field.integrities & CT_FOREIGN_KEY) constraints += "FK ";
+        if (field.integrities &(1 << CT_PRIMARY_KEY)) constraints += "PK ";
+        if (field.integrities &(1 << CT_NOT_NULL)   ) constraints += "NN ";
+        if (field.integrities &(1 << CT_UNIQUE)     ) constraints += "UQ ";
+        if (field.integrities &(1 << CT_DEFAULT)    ) constraints += "DE ";
+        if (field.integrities &(1 << CT_FOREIGN_KEY)) constraints += "FK ";
 
         message += QString("| %1 | %2 | %3 | %4 |\n")
                        .arg(QString::fromUtf8(field.name).leftJustified(20, ' '))
