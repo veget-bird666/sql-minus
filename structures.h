@@ -111,6 +111,27 @@ struct FieldBlock {
 
 
 
+#pragma pack(push, 1)
+// 字段值（支持动态类型）
+struct FieldValue {
+    qint32 type;   // 数据类型（DataType枚举）
+    union {
+        qint32 intVal;
+        bool boolVal;
+        double doubleVal;
+        char varcharVal[256]; // 变长字符串需按实际长度存储
+    };
+};
+
+// 数据行（对应.trd文件的一条记录）
+struct DataRow {
+    qint64 rowId;           // 行ID（自增）
+    qint32 fieldCount;      // 字段数
+    FieldValue values[];    // 变长数组，按字段顺序存储
+};
+#pragma pack(pop)
+
+
 
 
 #endif // STRUCTURES_H
