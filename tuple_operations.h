@@ -2,6 +2,10 @@
 #define TUPLE_OPERATIONS_H
 #include "operation.h"
 #include "structures.h"
+#include <QString>
+#include <vector>
+
+
 class TupleOperation : public Operation{
 
 };
@@ -15,6 +19,16 @@ public:
     void execute() override;
 };
 
-#endif // TUPLE_OPERATIONS_H
 
+class SelectAllOperation : public Operation {
+public:
+    QString dbName;
+    QString tableName;
 
+    SelectAllOperation(const QString& dbName, const QString& tableName)
+        : dbName(dbName), tableName(tableName) {}
+
+    void execute() override;
+};
+
+#endif
