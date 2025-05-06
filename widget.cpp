@@ -33,8 +33,9 @@ void Widget::on_clearButton_clicked()
 void Widget::on_executeButton_clicked()
 {
 
+    QString sql_command = ui->commandEdit->toPlainText();
     //QString sql_command = server.
-    /*try {
+    try {
 
         Operation* o = SqlParser::parse(sql_command);
         o->execute();
@@ -46,7 +47,7 @@ void Widget::on_executeButton_clicked()
 // 粘贴文本操作
 void Widget::showMessage(QString message){
     ui->informationEdit->append(message);
-    server->clientSocket->write(message.toUtf8());
-    server->clientSocket->flush();
+    // server->clientSocket->write(message.toUtf8());
+    // server->clientSocket->flush();
 
 }
