@@ -2,7 +2,7 @@
 #define STRUCTURES_H
 #pragma once
 #include <QtGlobal>
-
+#include <vector>
 // 此文件用来定义文件存储时序列化、反序列化的所有结构体
 // 注：需求文件中的int值全部转为qin32 严格控制为32位
 
@@ -123,15 +123,23 @@ struct FieldValue {
     };
 };
 
-// 数据行（对应.trd文件的一条记录）
-struct DataRow {
-    qint64 rowId;           // 行ID（自增）
-    qint32 fieldCount;      // 字段数
-    FieldValue values[];    // 变长数组，按字段顺序存储
+#pragma pack(push, 1)
+struct DataRowHeader {
+    qint64 rowId;       // 行ID（自增）
+    qint32 fieldCount;  // 字段数
 };
 #pragma pack(pop)
 
+// 注意：DataRow 不再使用 #pragma pack，使用默认对齐
+struct DataRow {
+    DataRowHeader header;
+    std::vector<FieldValue> values;
 
+    // 计算总大小
+    size_t size() const {
+        return sizeof(DataRowHeader) + values.size() * sizeof(FieldValue);
+    }
+};
 
 
 #endif // STRUCTURES_H
