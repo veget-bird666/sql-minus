@@ -46,6 +46,20 @@ public:
     // 读取表字段定义
     static std::vector<FieldBlock> readTableFields(const QString& dbName, const QString& tableName);
 
+
+        // 追加数据行到.trd文件
+        static void appendDataRow(
+            const QString& dbName,
+            const QString& tableName,
+            const DataRow& row
+            );
+
+        // // 读取表的字段定义（用于校验插入数据的类型）
+        // static std::vector<FieldBlock> readTableFields(
+        //     const QString& dbName,
+        //     const QString& tableName
+        //     );
+
 private:
 
     // 生成表文件路径（辅助方法）
