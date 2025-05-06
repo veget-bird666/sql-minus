@@ -48,12 +48,9 @@ void Widget::on_executeButton_clicked()
 // 粘贴文本操作
 void Widget::showMessage(QString message){
     ui->informationEdit->append(message);
-// <<<<<<< HEAD
+
 //     // server->clientSocket->write(message.toUtf8());
 //     // server->clientSocket->flush();
 
-// =======
-//     server->clientSocket->write(message.toUtf8());
-//     server->clientSocket->flush();
-// >>>>>>> 3f23e1d2946e011b3356045a5a4180812ba9c425
+
 }
