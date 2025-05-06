@@ -1,6 +1,7 @@
 #include "sqlparser.h"
 #include "database_operations.h"
 #include "table_operations.h"
+#include "tuple_operations.h"
 #include <QRegularExpression>
 #include "structures.h"
 extern QString currentDB;
@@ -153,6 +154,39 @@ Operation* SqlParser::parse(const QString& sql) {
         return new DescribeTableOperation(currentDB, tableName);
     }
 
+    // 匹配 INSERT 语句（格式：INSERT INTO table VALUES (v1, v2, ...);）
+    static QRegularExpression insertRegex(
+        "^INSERT INTO (\\w+) VALUES \\((.+)\\);$",
+        QRegularExpression::CaseInsensitiveOption
+        );
+
+    QRegularExpressionMatch match = insertRegex.match(sql);
+    if (match.hasMatch()) {
+        QString tableName = match.captured(1).trimmed();
+        QStringList values = match.captured(2).split(',', Qt::SkipEmptyParts);
+
+        // 构造InsertOperation
+        InsertOperation* op = new InsertOperation();
+        op->dbName = currentDB;
+        op->tableName = tableName;
+
+        // 转换值类型（需根据表字段定义动态判断，此处简化）
+        for (const QString& valStr : values) {
+            FieldValue val;
+            if (valStr.contains("'")) { // 字符串
+                val.type = DT_VARCHAR;
+                strncpy(val.varcharVal, valStr.trimmed().mid(1, valStr.length() - 2).toUtf8(), 256);
+            } else if (valStr.contains(".")) { // 浮点数
+                val.type = DT_DOUBLE;
+                val.doubleVal = valStr.toDouble();
+            } else { // 整数
+                val.type = DT_INTEGER;
+                val.intVal = valStr.toInt();
+            }
+             op->values.push_back(val);
+        }
+        return op;
+    }
 
 
     // 如果都未匹配，抛出异常
@@ -170,6 +204,7 @@ QList<FieldBlock> SqlParser::extractFields(const QString& tableDefinition) {
     while (matchIterator.hasNext()) {
         QRegularExpressionMatch match = matchIterator.next();
         FieldBlock field;
+        memset(&field, 0, sizeof(FieldBlock));
         field.order = fields.size() + 1; // 字段顺序从 1 开始
         QString fieldName = match.captured(1).trimmed();
         QString fieldType = match.captured(2).trimmed();
@@ -178,47 +213,51 @@ QList<FieldBlock> SqlParser::extractFields(const QString& tableDefinition) {
         // 类型映射
         if (fieldType == "INTEGER" || fieldType == "int") {
             field.type = DT_INTEGER;
+            field.param = 0;
         } else if (fieldType == "BOOL" || fieldType == "bool") {
             field.type = DT_BOOL;
+            field.param = 0;
         } else if (fieldType == "DOUBLE" || fieldType == "double") {
             field.type = DT_DOUBLE;
+            field.param = 0;
         } else if (fieldType == "VARCHAR" || fieldType == "varchar") {
             field.type = DT_VARCHAR;
             field.param = match.captured(4).toInt(); // VARCHAR 长度
         } else if (fieldType == "DATETIME" || fieldType == "datatime") {
             field.type = DT_DATETIME;
+            field.param = 0;
         }
 
         QString constraint = match.captured(5).trimmed();
 
         // 解析 PRIMARY KEY
         if (constraint.contains("PRIMARY KEY") || constraint.contains("primary key")) {
-            field.integrities |= CT_PRIMARY_KEY;
+            field.integrities |=(1 << CT_PRIMARY_KEY );
         }
 
         // 解析 NOT NULL
         if (constraint.contains("NOT NULL") || constraint.contains("not null")) {
-            field.integrities |= CT_NOT_NULL;
+            field.integrities |=(1 << CT_NOT_NULL);
         }
 
         // 解析 UNIQUE
         if (constraint.contains("UNIQUE") || constraint.contains("unique")) {
-            field.integrities |= CT_UNIQUE;
+            field.integrities |=(1 << CT_UNIQUE);
         }
 
         // 解析 DEFAULT
         if (constraint.startsWith("DEFAULT") || constraint.startsWith("default")) {
-            field.integrities |= CT_DEFAULT;
+            field.integrities |=(1 << CT_DEFAULT);
         }
 
         // 解析 AUTO_INCREMENT
         if (constraint.contains("AUTO_INCREMENT") || constraint.contains("auto_increment")) {
-            field.integrities |= CT_IDENTITY;
+            field.integrities |=(1 << CT_IDENTITY);
         }
 
         // 解析 FOREIGN KEY
         if (constraint.contains("FOREIGN KEY") || constraint.contains("foreign key")) {
-            field.integrities |= CT_FOREIGN_KEY;
+            field.integrities |=(1 << CT_FOREIGN_KEY);
             QString refTable = match.captured(7).trimmed();
             QString refField = match.captured(8).trimmed();
             strncpy(field.ref_table, refTable.toStdString().c_str(), sizeof(field.ref_table));
@@ -227,7 +266,7 @@ QList<FieldBlock> SqlParser::extractFields(const QString& tableDefinition) {
 
         // 解析 CHECK
         if (constraint.contains("CHECK") || constraint.contains("check")) {
-            field.integrities |= CT_CHECK;
+            field.integrities |=(1 << CT_CHECK);
             QString checkCondition = match.captured(9).trimmed();
             strncpy(field.check_condition, checkCondition.toStdString().c_str(), sizeof(field.check_condition));
         }
