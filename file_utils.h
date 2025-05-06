@@ -59,7 +59,12 @@ public:
         //     const QString& dbName,
         //     const QString& tableName
         //     );
+        // 更新
+        static void updateTableBlocks(const QString& dbName, const std::vector<TableBlock>& tables);
 
+
+        // 新增方法：读取表的所有记录
+        static std::vector<DataRow> readAllDataRows(const QString& dbName, const QString& tableName);
 private:
 
     // 生成表文件路径（辅助方法）
@@ -70,6 +75,7 @@ private:
 
     // 生成完整性约束文件（.tic）
     static void createIntegrityFile(const vector<IntegrityConstraint>& constraints, const QString& ticPath);
+
 
 };
 
