@@ -189,6 +189,20 @@ Operation* SqlParser::parse(const QString& sql) {
     }
 
 
+    // 匹配 SELECT * 语句
+    static QRegularExpression selectAllRegex(
+        "^SELECT\\s+\\*\\s+FROM\\s+(\\w+)\\s*;$",
+        QRegularExpression::CaseInsensitiveOption | QRegularExpression::MultilineOption
+        );
+
+    QRegularExpressionMatch selectMatch = selectAllRegex.match(sql);
+    if (selectMatch.hasMatch()) {
+        QString tableName = selectMatch.captured(1).trimmed();
+        QString dbName = currentDB;
+        return new SelectAllOperation(dbName, tableName);
+    }
+
+
     // 如果都未匹配，抛出异常
     throw std::invalid_argument("输入指令格式错误");
 }
