@@ -11,7 +11,7 @@
 class TupleManager : public Manager {
 public:
     static void insert(const InsertOperation* op);
-
+    static void selectAll(const SelectAllOperation* operation);
 };
 
 #endif // TUPLE_MANAGER_H
