@@ -4,6 +4,7 @@
 #include "structures.h"
 #include "table_operations.h"
 #include <vector>
+#include <cstring>
 
 class FileUtil{
 public:
@@ -26,6 +27,8 @@ public:
     // 递归删除数据库文件夹
     static void deleteDatabaseDirectory(const QString& dbName);
 
+    // 生成表文件路径（辅助方法）
+    static QString generateTableFilePath(const QString& dbName, const QString& tableName, const QString& suffix);
 
     // 创建表文件（核心逻辑）
     static void createTableFiles(const CreateTableOperation* operation, const QString& dbName);
@@ -67,8 +70,7 @@ public:
         static std::vector<DataRow> readAllDataRows(const QString& dbName, const QString& tableName);
 private:
 
-    // 生成表文件路径（辅助方法）
-    static QString generateTableFilePath(const QString& dbName, const QString& tableName, const QString& suffix);
+
 
     // 生成索引数据文件（.ix）
     static void createIndexFile(const IndexBlock& index);
