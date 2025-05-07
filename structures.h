@@ -3,12 +3,11 @@
 #pragma once
 #include <QtGlobal>
 #include <vector>
+#include <cstring>
 // 此文件用来定义文件存储时序列化、反序列化的所有结构体
 // 注：需求文件中的int值全部转为qin32 严格控制为32位
 
 
-
-#pragma pack(push, 1)
 
 // ------------------------------
 // 数据类型枚举 (对应需求文档 3.12.1)
@@ -111,7 +110,6 @@ struct FieldBlock {
 
 
 
-#pragma pack(push, 1)
 // 字段值（支持动态类型）
 struct FieldValue {
     qint32 type;   // 数据类型（DataType枚举）
@@ -140,6 +138,62 @@ struct DataRow {
         return sizeof(DataRowHeader) + values.size() * sizeof(FieldValue);
     }
 };
+
+
+
+
+
+// 条件结构体，用于where后条件的判断
+#pragma pack(push, 1)
+struct Condition {
+    char fieldName[128];      // 字段名
+    qint32 operatorType;      // 操作符类型(0=, 1<, 2>, 3<=, 4>=, 5!=)
+    FieldValue compareValue;  // 比较值
+
+    // 评估条件是否满足
+    bool evaluate(const FieldValue& rowValue) const {
+        switch (operatorType) {
+        case 0: // =
+            return compareFieldValues(rowValue, compareValue) == 0;
+        case 1: // <
+            return compareFieldValues(rowValue, compareValue) < 0;
+        case 2: // >
+            return compareFieldValues(rowValue, compareValue) > 0;
+        case 3: // <=
+            return compareFieldValues(rowValue, compareValue) <= 0;
+        case 4: // >=
+            return compareFieldValues(rowValue, compareValue) >= 0;
+        case 5: // !=
+            return compareFieldValues(rowValue, compareValue) != 0;
+        default:
+            return false;
+        }
+    }
+
+private:
+    // 比较两个FieldValue
+    int compareFieldValues(const FieldValue& v1, const FieldValue& v2) const {
+        if (v1.type != v2.type) return -1; // 类型不同
+
+        switch (v1.type) {
+        case DT_INTEGER:
+            return v1.intVal - v2.intVal;
+        case DT_BOOL:
+            return v1.boolVal - v2.boolVal;
+        case DT_DOUBLE:
+            return (v1.doubleVal < v2.doubleVal) ? -1 : (v1.doubleVal > v2.doubleVal) ? 1 : 0;
+        case DT_VARCHAR:
+            return strcmp(v1.varcharVal, v2.varcharVal);
+        case DT_DATETIME:
+            return (v1.intVal < v2.intVal) ? -1 : (v1.intVal > v2.intVal) ? 1 : 0;
+        default:
+            return -1;
+        }
+    }
+};
+#pragma pack(pop)
+
+
 
 
 #endif // STRUCTURES_H
