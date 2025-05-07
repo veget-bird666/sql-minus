@@ -10,6 +10,7 @@
 
 extern Widget* widget;
 
+// 插入记录
 void TupleManager::insert(const InsertOperation* op) {
     // 1. 校验表是否存在
     auto tables = FileUtil::readAllTableBlocks(op->dbName);
@@ -52,7 +53,7 @@ void TupleManager::insert(const InsertOperation* op) {
     widget->showMessage("插入数据成功");
 }
 
-
+// 查询所有记录
 void TupleManager::selectAll(const SelectAllOperation* operation) {
 
     QString dbName = operation->dbName;
@@ -125,3 +126,74 @@ void TupleManager::selectAll(const SelectAllOperation* operation) {
     }
 }
 
+
+
+// 删除记录
+void TupleManager::deleteRows(const DeleteOperation* op) {
+    // 1. 读取表的所有记录
+    std::vector<DataRow> allRows = FileUtil::readAllDataRows(op->dbName, op->tableName);
+
+    // 2. 过滤出要保留的记录
+    std::vector<DataRow> remainingRows;
+    std::vector<FieldBlock> fields = FileUtil::readTableFields(op->dbName, op->tableName);
+
+    for (const DataRow& row : allRows) {
+        bool shouldDelete = true;
+
+        // 检查是否满足所有条件
+        for (const Condition& cond : op->conditions) {
+            // 查找字段索引
+            int fieldIndex = -1;
+            for (size_t i = 0; i < fields.size(); i++) {
+                if (strcmp(fields[i].name, cond.fieldName) == 0) {
+                    fieldIndex = i;
+                    break;
+                }
+            }
+
+            if (fieldIndex == -1 || fieldIndex >= row.values.size()) {
+                shouldDelete = false;
+                break;
+            }
+
+            if (!cond.evaluate(row.values[fieldIndex])) {
+                shouldDelete = false;
+                break;
+            }
+        }
+
+        if (!shouldDelete) {
+            remainingRows.push_back(row);
+        }
+    }
+
+    // 3. 更新表记录数
+    auto tables = FileUtil::readAllTableBlocks(op->dbName);
+    for (auto& table : tables) {
+        if (strcmp(table.name, op->tableName.toUtf8().constData()) == 0) {
+            table.record_num = remainingRows.size();
+            table.mtime = QDateTime::currentSecsSinceEpoch();
+            break;
+        }
+    }
+
+    // 4. 重写.trd文件
+    QString trdPath = FileUtil::generateTableFilePath(op->dbName, op->tableName, "trd");
+    QFile trdFile(trdPath);
+    if (!trdFile.open(QIODevice::WriteOnly)) {
+        throw std::runtime_error("无法打开记录文件");
+    }
+
+    for (const DataRow& row : remainingRows) {
+        trdFile.write(reinterpret_cast<const char*>(&row.header), sizeof(DataRowHeader));
+        trdFile.write(reinterpret_cast<const char*>(row.values.data()),
+                      row.values.size() * sizeof(FieldValue));
+    }
+
+    trdFile.close();
+
+    // 5. 更新.tb文件
+    FileUtil::updateTableBlocks(op->dbName, tables);
+
+    widget->showMessage(QString("成功删除%1条记录").arg(allRows.size() - remainingRows.size()));
+}
