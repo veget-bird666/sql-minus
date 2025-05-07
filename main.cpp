@@ -29,4 +29,8 @@ int main(int argc, char *argv[])
  * alter table t06 drop column c02;
  * alter table t07 modify column c03 int;
  *
+ * INSERT INTO t06 VALUES ('RJ2406', 18 );   VALUES后加空格
+ * DELETE FROM t06 WHERE age > 16;
+ * DELETE FROM t06 WHERE age = 18;
+ * SELECT * FROM t06;
  */
