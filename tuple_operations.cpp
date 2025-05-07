@@ -9,3 +9,7 @@ void InsertOperation::execute() {
 void SelectAllOperation::execute() {
     TupleManager::selectAll(this);
 }
+
+void DeleteOperation::execute() {
+    TupleManager::deleteRows(this);
+}
