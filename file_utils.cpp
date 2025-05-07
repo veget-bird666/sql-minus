@@ -495,6 +495,7 @@ std::vector<DataRow> FileUtil::readAllDataRows(const QString& dbName, const QStr
         ptr += sizeof(DataRowHeader);
 
         // 2. 检查字段数是否合理
+        qDebug()<<row.header.fieldCount;
         if (row.header.fieldCount <= 0 || row.header.fieldCount > 1000) {
             throw std::runtime_error("Invalid field count in row");
         }
