@@ -4,6 +4,10 @@
 #include "tuple_operations.h"
 #include <QRegularExpression>
 #include "structures.h"
+#include "file_utils.h"
+#include <QDateTime>
+#include <cstring>
+
 extern QString currentDB;
 
 SqlParser::SqlParser() {}
@@ -188,6 +192,29 @@ Operation* SqlParser::parse(const QString& sql) {
         return op;
     }
 
+    // 匹配 DELETE FROM 表名 WHERE 条件
+    static QRegularExpression deleteRegex(
+        "^DELETE\\s+FROM\\s+(\\w+)(?:\\s+WHERE\\s+(.+))?\\s*;$",
+        QRegularExpression::CaseInsensitiveOption
+        );
+
+    QRegularExpressionMatch deleteMatch = deleteRegex.match(sql);
+    if (deleteMatch.hasMatch()) {
+        QString tableName = deleteMatch.captured(1).trimmed();
+        QString whereClause = deleteMatch.captured(2).trimmed();
+
+        // 读取表字段定义
+        std::vector<FieldBlock> fields = FileUtil::readTableFields(currentDB, tableName);
+
+        // 解析WHERE条件
+        std::vector<Condition> conditions;
+        if (!whereClause.isEmpty()) {
+            conditions = parseWhereClause(whereClause, fields);
+        }
+
+        return new DeleteOperation(currentDB, tableName, conditions);
+    }
+
 
     // 匹配 SELECT * 语句
     static QRegularExpression selectAllRegex(
@@ -290,3 +317,101 @@ QList<FieldBlock> SqlParser::extractFields(const QString& tableDefinition) {
     return fields;
 }
 
+
+
+std::vector<Condition> SqlParser::parseWhereClause(const QString& whereClause, const std::vector<FieldBlock>& fields) {
+    std::vector<Condition> conditions;
+
+    // 简单实现：用AND分割多个条件
+    QStringList conditionStrs = whereClause.split("AND", Qt::SkipEmptyParts, Qt::CaseInsensitive);
+
+    for (QString condStr : conditionStrs) {
+        conditions.push_back(parseSingleCondition(condStr.trimmed(), fields));
+    }
+
+    return conditions;
+}
+
+// 解析where后的条件
+Condition SqlParser::parseSingleCondition(const QString& conditionStr, const std::vector<FieldBlock>& fields) {
+    Condition cond;
+    memset(&cond, 0, sizeof(Condition));
+
+    // 解析操作符
+    static QMap<QString, int> opMap = {
+        {"=", 0}, {"<", 1}, {">", 2}, {"<=", 3}, {">=", 4}, {"!=", 5}
+    };
+
+    // 查找操作符
+    int opPos = -1;
+    QString opStr;
+    for (auto it = opMap.begin(); it != opMap.end(); ++it) {
+        int pos = conditionStr.indexOf(it.key());
+        if (pos > 0) {
+            opPos = pos;
+            opStr = it.key();
+            break;
+        }
+    }
+
+    if (opPos == -1) {
+        throw std::invalid_argument("Invalid operator in condition");
+    }
+
+    // 提取字段名和值
+    QString fieldName = conditionStr.left(opPos).trimmed();
+    QString valueStr = conditionStr.mid(opPos + opStr.length()).trimmed();
+
+    // 查找字段定义
+    auto fieldIt = std::find_if(fields.begin(), fields.end(),
+                                [&fieldName](const FieldBlock& f) {
+                                    return QString::fromUtf8(f.name) == fieldName;
+                                });
+
+    if (fieldIt == fields.end()) {
+        throw std::invalid_argument("Field not found: " + fieldName.toStdString());
+    }
+
+    // 填充Condition结构体
+    strncpy(cond.fieldName, fieldName.toUtf8().constData(), sizeof(cond.fieldName));
+    cond.operatorType = opMap[opStr];
+    cond.compareValue = stringToFieldValue(valueStr, static_cast<DataType>(fieldIt->type));
+
+    return cond;
+}
+
+
+// 将字符串转换为FieldValue
+FieldValue SqlParser::stringToFieldValue(const QString& str, DataType type) {
+    FieldValue val;
+    memset(&val, 0, sizeof(FieldValue));
+    val.type = type;
+
+    switch (type) {
+    case DT_INTEGER:
+        val.intVal = str.toInt();
+        break;
+    case DT_BOOL:
+        val.boolVal = str.toLower() == "true" || str == "1";
+        break;
+    case DT_DOUBLE:
+        val.doubleVal = str.toDouble();
+        break;
+    case DT_VARCHAR: {
+        QString cleanStr = str;
+        if (cleanStr.startsWith('\'') && cleanStr.endsWith('\'')) {
+            cleanStr = cleanStr.mid(1, cleanStr.length() - 2);
+        }
+        strncpy(val.varcharVal, cleanStr.toUtf8().constData(), sizeof(val.varcharVal));
+        break;
+    }
+    case DT_DATETIME:
+        // 简化处理，实际可能需要解析日期时间字符串
+        val.intVal = QDateTime::fromString(str, Qt::ISODate).toSecsSinceEpoch();
+        break;
+    default:
+        throw std::invalid_argument("Unsupported data type");
+    }
+
+    return val;
+}
