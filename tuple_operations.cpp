@@ -13,3 +13,7 @@ void SelectAllOperation::execute() {
 void DeleteOperation::execute() {
     TupleManager::deleteRows(this);
 }
+
+void SelectColumnsOperation::execute() {
+    TupleManager::selectColumns(this);
+}
