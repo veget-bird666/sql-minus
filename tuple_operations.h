@@ -19,7 +19,7 @@ public:
     void execute() override;
 };
 
-
+// 查找数据操作
 class SelectAllOperation : public TupleOperation {
 public:
     QString dbName;
@@ -44,5 +44,21 @@ public:
 
     void execute() override;
 };
+
+class SelectColumnsOperation : public TupleOperation {
+    public:
+        QString dbName;
+        QString tableName;
+        QStringList columns;  // 要查询的列名列表
+        std::vector<Condition> conditions;  // WHERE条件
+        
+        explicit SelectColumnsOperation(
+            const QString& db, 
+            const QString& table, 
+            const QStringList& cols
+        ) : dbName(db), tableName(table), columns(cols) {}
+        
+        void execute() override;
+    };
 
 #endif
