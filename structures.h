@@ -13,6 +13,7 @@
 // 数据类型枚举 (对应需求文档 3.12.1)
 // ------------------------------
 enum DataType {
+    DT_NULL = -1,      // 为处理代码而临时添加的空值类型，待修改
     DT_INTEGER = 0,    // 4字节整型
     DT_BOOL = 1,       // 1字节布尔
     DT_DOUBLE = 2,     // 8字节浮点
@@ -87,7 +88,21 @@ struct TableBlock {
 
 };
 
+// 聚合函数结构体
+struct FunctionCall {
+    char funcName[32];   // 函数名（COUNT/MAX/MIN等）
+    char fieldName[128]; // 作用的字段名（或"*"）
+    qint32 funcType;     // 函数类型枚举值
+};
 
+// 函数类型枚举
+enum FunctionType {
+    FT_COUNT,
+    FT_MAX,
+    FT_MIN,
+    FT_AVG,
+    FT_SUM
+};
 
 // 表定义文件结构体（对应 [表名].tdf 文件）
 struct FieldBlock {
@@ -98,12 +113,30 @@ struct FieldBlock {
     qint64 mtime;         // 最后修改时间
     qint32 integrities;   // 完整性约束
 
-    // 外键约束相关
-    char ref_table[128];  // 引用的表名 (外键约束)
-    char ref_field[128];  // 引用的字段名 (外键约束)
+    // // 外键约束相关
+    // char ref_table[128];  // 引用的表名 (外键约束)
+    // char ref_field[128];  // 引用的字段名 (外键约束)
 
     // 检查约束相关
     char check_condition[256];  // 检查约束条件
+
+    // 新增聚合函数信息（共用体节省空间）
+    union {
+        // struct {
+        //     char funcName[32];    // 对齐 FunctionCall.funcName
+        //     char funcField[128];  // 对齐 FunctionCall.fieldName
+        //     qint32 funcType;      // 对齐 FunctionCall.funcType
+        // };
+        FunctionCall func;
+        struct {
+            char ref_table[128];   // 与原外键字段共用空间
+            char ref_field[128];
+            qint32 reserved;      // 占位对齐
+        };
+    };
+
+    // 标记是否为函数字段(默认不是）
+    bool isAggregateFunc = false;
 };
 
 #pragma pack(pop)
@@ -170,7 +203,7 @@ struct Condition {
         }
     }
 
-private:
+
     // 比较两个FieldValue
     int compareFieldValues(const FieldValue& v1, const FieldValue& v2) const {
         if (v1.type != v2.type) return -1; // 类型不同
