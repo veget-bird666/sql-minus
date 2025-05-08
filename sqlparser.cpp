@@ -229,21 +229,55 @@ Operation* SqlParser::parse(const QString& sql) {
         return new SelectAllOperation(dbName, tableName);
     }
 
+    // 匹配 SELECT [属性] WHERE 语句
+    // 在 SqlParser::parse() 中添加新的匹配模式
+static QRegularExpression selectColumnsRegex(
+    "^SELECT\\s+(.+?)\\s+FROM\\s+(\\w+)(?:\\s+WHERE\\s+(.+))?\\s*;$",
+    QRegularExpression::CaseInsensitiveOption
+);
+
+// 解析示例：SELECT id, name FROM users WHERE age > 18;
+//QRegularExpressionMatch match = selectColumnsRegex.match(sql);
+if (match.hasMatch()) {
+    QStringList columns = match.captured(1).split(',', Qt::SkipEmptyParts);
+    QString tableName = match.captured(2).trimmed();
+    QString whereClause = match.captured(3).trimmed();
+    
+    // 创建操作对象
+    QString dbName = currentDB;
+    auto* op = new SelectColumnsOperation(dbName, tableName, columns);
+    if (!whereClause.isEmpty()) {
+        auto fields = FileUtil::readTableFields(dbName, tableName);
+        op->conditions = parseWhereClause(whereClause, fields);
+    }
+    return op;
+}
+
 
     // 如果都未匹配，抛出异常
     throw std::invalid_argument("输入指令格式错误");
 }
 
-// 解析字段定义部分
 QList<FieldBlock> SqlParser::extractFields(const QString& tableDefinition) {
     QList<FieldBlock> fields;
+
+    // 第一阶段：解析普通字段定义
     static QRegularExpression fieldRegex(
-        "(\\w+)\\s+(\\w+)(\\((\\d+)\\))?\\s*(PRIMARY KEY|NOT NULL|UNIQUE|DEFAULT\\s+[^,]+|AUTO_INCREMENT|FOREIGN KEY\\s+REFERENCES\\s+(\\w+)\\s*\\((\\w+)\\)|CHECK\\s*\\(([^,]+)\\))?\\s*",
+        "(\\w+)\\s+(\\w+)(\\((\\d+)\\))?\\s*(PRIMARY KEY|NOT NULL|UNIQUE|DEFAULT\\s+[^,]+|AUTO_INCREMENT|"
+        "FOREIGN KEY\\s+REFERENCES\\s+(\\w+)\\s*\\((\\w+)\\)|CHECK\\s*\\(([^,]+)\\))?\\s*,?",
         QRegularExpression::CaseInsensitiveOption
         );
-    QRegularExpressionMatchIterator matchIterator = fieldRegex.globalMatch(tableDefinition);
-    while (matchIterator.hasNext()) {
-        QRegularExpressionMatch match = matchIterator.next();
+
+    // 第二阶段：解析聚合函数（如COUNT(*), MAX(age)）
+    static QRegularExpression funcRegex(
+        "(\\w+)\\(\\s*([\\w\\*]+)\\s*\\)",
+        QRegularExpression::CaseInsensitiveOption
+        );
+
+    // 先处理普通字段定义
+    QRegularExpressionMatchIterator fieldIter = fieldRegex.globalMatch(tableDefinition);
+    while (fieldIter.hasNext()) {
+        QRegularExpressionMatch match = fieldIter.next();
         FieldBlock field;
         memset(&field, 0, sizeof(FieldBlock));
         field.order = fields.size() + 1; // 字段顺序从 1 开始
@@ -314,6 +348,65 @@ QList<FieldBlock> SqlParser::extractFields(const QString& tableDefinition) {
 
         fields.append(field);
     }
+    // 单独处理聚合函数（新增逻辑）
+    QRegularExpressionMatchIterator funcIter = funcRegex.globalMatch(tableDefinition);
+    while (funcIter.hasNext()) {
+        QRegularExpressionMatch match = funcIter.next();
+        FieldBlock funcField;
+        memset(&funcField, 0, sizeof(FieldBlock));
+
+        // 设置函数信息
+        QString funcName = match.captured(1).toUpper();
+        QString fieldName = match.captured(2).trimmed();
+
+        // 填充FunctionCall结构
+        strncpy(funcField.func.funcName, funcName.toUtf8().constData(), 32);
+        strncpy(funcField.func.fieldName, fieldName.toUtf8().constData(), 128);
+
+        // 设置函数类型（与原有枚举值匹配）
+        if (funcName == "COUNT") funcField.func.funcType = FT_COUNT;
+        else if (funcName == "MAX") funcField.func.funcType = FT_MAX;
+        else if (funcName == "MIN") funcField.func.funcType = FT_MIN;
+        else if (funcName == "AVG") funcField.func.funcType = FT_AVG;
+        else if (funcName == "SUM") funcField.func.funcType = FT_SUM;
+
+        // 设置字段元数据
+        funcField.order = fields.size() + 1;
+        snprintf(funcField.name, 128, "%s(%s)", funcName.toUtf8().constData(), fieldName.toUtf8().constData());
+        funcField.type = (funcField.func.funcType == FT_COUNT) ? DT_INTEGER : DT_DOUBLE;
+        funcField.isAggregateFunc = true;
+
+        fields.append(funcField);
+    }
+        // QRegularExpressionMatchIterator it = funcRegex.globalMatch(tableDefinition);
+        // while (it.hasNext()) {
+        //     QRegularExpressionMatch match = it.next();
+        //     FieldBlock funcField;
+        //     memset(&funcField, 0, sizeof(FieldBlock));
+
+        //     // 填充函数信息
+        //     QString funcName = match.captured(1).toUpper();
+        //     QString fieldName = match.captured(2).trimmed();
+
+        //     // 设置FunctionCall
+        //     strncpy(funcField.func.funcName, funcName.toUtf8().constData(), 32);
+        //     strncpy(funcField.func.fieldName, fieldName.toUtf8().constData(), 128);
+
+        //     // 设置函数类型
+        //     if (funcName == "COUNT") funcField.func.funcType = FT_COUNT;
+        //     else if (funcName == "MAX") funcField.func.funcType = FT_MAX;
+        //     // ...其他函数类型判断
+
+        //     // 标记为函数字段
+        //     funcField.isAggregateFunc = true;
+
+        //     // 设置显示名称和返回类型
+        //     snprintf(funcField.name, 128, "%s(%s)", funcField.func.funcName, funcField.func.fieldName);
+        //     funcField.type = (funcField.func.funcType == FT_COUNT) ? DT_INTEGER : DT_DOUBLE;
+
+        //     fields.append(funcField);
+        // }
+
     return fields;
 }
 
