@@ -87,14 +87,20 @@ struct TableBlock {
     qint64 mtime;         // 修改时间（初始等于创建时间）
 
 };
+#pragma pack(pop)
 
+
+#pragma pack(push, 1)
 // 聚合函数结构体
 struct FunctionCall {
     char funcName[32];   // 函数名（COUNT/MAX/MIN等）
     char fieldName[128]; // 作用的字段名（或"*"）
     qint32 funcType;     // 函数类型枚举值
 };
+#pragma pack(pop)
 
+
+#pragma pack(push, 1)
 // 函数类型枚举
 enum FunctionType {
     FT_COUNT,
@@ -103,7 +109,10 @@ enum FunctionType {
     FT_AVG,
     FT_SUM
 };
+#pragma pack(pop)
 
+
+#pragma pack(push, 1)
 // 表定义文件结构体（对应 [表名].tdf 文件）
 struct FieldBlock {
     qint32 order;         // 字段顺序（从1开始）
