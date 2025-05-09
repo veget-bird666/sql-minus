@@ -409,6 +409,11 @@ std::vector<FieldBlock> FileUtil::readTableFields(const QString& dbName, const Q
     QByteArray data = tdfFile.readAll();
     tdfFile.close();
 
+    // 验证数据大小是 FieldBlock 的整数倍
+    if (data.size() % sizeof(FieldBlock) != 0) {
+        throw std::runtime_error("表定义文件损坏: 大小不匹配");
+    }
+
     int blockCount = data.size() / sizeof(FieldBlock);
     for (int i = 0; i < blockCount; i++) {
         FieldBlock field;
