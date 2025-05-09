@@ -405,6 +405,18 @@
 			"EWIEGA46WW/moc_table_operations.cpp",
 			null
 		],
+		[
+			"D:/Git/sql-minus/tuple_manager.h",
+			"MU",
+			"EWIEGA46WW/moc_tuple_manager.cpp",
+			null
+		],
+		[
+			"D:/Git/sql-minus/tuple_operations.h",
+			"MU",
+			"EWIEGA46WW/moc_tuple_operations.cpp",
+			null
+		],
 		[ "D:/Git/sql-minus/widget.h", "MU", "EWIEGA46WW/moc_widget.cpp", null ]
 	],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
@@ -473,6 +485,8 @@
 		[ "D:/Git/sql-minus/sqlparser.cpp", "MU", null ],
 		[ "D:/Git/sql-minus/table_manager.cpp", "MU", null ],
 		[ "D:/Git/sql-minus/table_operations.cpp", "MU", null ],
+		[ "D:/Git/sql-minus/tuple_manager.cpp", "MU", null ],
+		[ "D:/Git/sql-minus/tuple_operations.cpp", "MU", null ],
 		[ "D:/Git/sql-minus/widget.cpp", "MU", null ]
 	],
 	"UIC_OPTIONS" : [],

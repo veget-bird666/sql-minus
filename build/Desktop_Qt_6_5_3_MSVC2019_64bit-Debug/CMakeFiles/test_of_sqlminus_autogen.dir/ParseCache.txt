@@ -311,3 +311,7 @@ D:/Git/sql-minus/sqlparser.cpp
 D:/Git/sql-minus/table_manager.cpp
 D:/Git/sql-minus/widget.cpp
  uic:./ui_widget.h
+D:/Git/sql-minus/tuple_manager.h
+D:/Git/sql-minus/tuple_operations.cpp
+D:/Git/sql-minus/tuple_operations.h
+D:/Git/sql-minus/tuple_manager.cpp
