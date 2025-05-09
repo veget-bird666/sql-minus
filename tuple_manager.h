@@ -38,6 +38,9 @@ private:
         const std::vector<FieldBlock>& fields,
         const std::vector<DataRow>& rows,
         const std::vector<int>& columnIndices);
+    bool matchesWhereConditions(const DataRow& row,
+                                const std::vector<FieldBlock>& fields,
+                                const std::vector<Condition>& conditions) const;
 };
 
 #endif // TUPLE_MANAGER_H

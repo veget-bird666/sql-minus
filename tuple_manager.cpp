@@ -299,15 +299,130 @@ QString formatFunctionValue(const FieldValue& val) {
 //                .arg(formatFunctionValue(funcResult).leftJustified(15, ' '));
 
 // 查询部分记录
-void TupleManager::selectColumns(const SelectColumnsOperation* op) {
-    // 1. 读取元数据
-    auto fields = FileUtil::readTableFields(op->dbName, op->tableName);
-    auto allRows = FileUtil::readAllDataRows(op->dbName, op->tableName);
+// void TupleManager::selectColumns(const SelectColumnsOperation* op) {
+//     // 1. 读取元数据
+//     auto fields = FileUtil::readTableFields(op->dbName, op->tableName);
+//     auto allRows = FileUtil::readAllDataRows(op->dbName, op->tableName);
 
+//     std::vector<bool> isAggregateColumn;
+
+//     // 2. 验证列名并构建索引映射
+//     std::vector<int> columnIndices;
+//     for (const QString& col : op->columns) {
+//         bool found = false;
+//         for (size_t i = 0; i < fields.size(); ++i) {
+//             if (QString::fromUtf8(fields[i].name) == col.trimmed()) {
+//                 columnIndices.push_back(i);
+//                 isAggregateColumn.push_back(fields[i].isAggregateFunc);
+//                 found = true;
+//                 break;
+//             }
+//         }
+//         if (!found) throw std::runtime_error("Column not found: " + col.toStdString());
+//     }
+
+//     // 2.5 Apply WHERE filter first
+//     std::vector<DataRow> resultRows;
+//     for (const auto& row : allRows) {
+//         bool matchAllConditions = true;
+
+//         // WHERE条件判断
+//         for (const auto& cond : op->conditions) {
+//             int fieldIdx = -1;
+//             for (size_t i = 0; i < fields.size(); i++) {
+//                 if (strcmp(fields[i].name, cond.fieldName) == 0) {
+//                     fieldIdx = i;
+//                     break;
+//                 }
+//             }
+
+//             // if (fieldIdx == -1 || !cond.evaluate(row.values[fieldIdx])) {
+//             //     matchAllConditions = false;
+//             //     break;
+//             // }  // 无条件则抛出异常
+//             // if (fieldIdx == -1) continue; // 跳过无效条件
+//             if (fieldIdx == -1) {
+//                 matchAllConditions = false;
+//                 break;
+//             }
+//         }
+
+//         if (matchAllConditions) {
+//             resultRows.push_back(row);
+//         }
+//     }
+
+//     // Now decide whether to compute aggregates or just print values
+//     if (std::any_of(isAggregateColumn.begin(), isAggregateColumn.end(), [](bool b){ return b; })) {
+//         TupleManager manager;
+//         manager.handleAggregateSelect(op, fields, allRows, columnIndices);
+//     } else {
+//         TupleManager manager;
+//         manager.handleRegularSelect(op, fields, allRows, columnIndices);
+//     }
+
+//     // // 3. 过滤数据
+//     // std::vector<DataRow> resultRows;
+//     // for (const auto& row : allRows) {
+//     //     bool matchAllConditions = true;
+        
+//     //     // WHERE条件判断
+//     //     for (const auto& cond : op->conditions) {
+//     //         int fieldIdx = -1;
+//     //         for (size_t i = 0; i < fields.size(); i++) {
+//     //             if (strcmp(fields[i].name, cond.fieldName) == 0) {
+//     //                 fieldIdx = i;
+//     //                 break;
+//     //             }
+//     //         }
+            
+//     //         // if (fieldIdx == -1 || !cond.evaluate(row.values[fieldIdx])) {
+//     //         //     matchAllConditions = false;
+//     //         //     break;
+//     //         // }  // 无条件则抛出异常
+//     //         if (fieldIdx == -1) continue; // 跳过无效条件
+//     //     }
+
+//     //     if (matchAllConditions) {
+//     //         resultRows.push_back(row);
+//     //     }
+//     // }
+
+//     // 4. 构建输出
+//     QString message = QString("+-----------------").repeated(columnIndices.size()) + "+\n";
+    
+//     // 表头
+//     for (const QString& col : op->columns) {
+//         message += QString("| %1 ").arg(col.leftJustified(15, ' '));
+//     }
+//     message += "|\n" + QString("+-----------------").repeated(columnIndices.size()) + "+\n";
+
+//     if (resultRows.empty()) {
+//         message = "No rows match the conditions";
+//     } // 友好提示
+
+//     // 数据行
+//     for (const auto& row : resultRows) {
+//         for (int colIdx : columnIndices) {
+//             const FieldValue& val = row.values[colIdx];;
+//             /* 值格式化逻辑（见上文实现） */
+//             TupleManager tempManager;
+//             QString str = tempManager.formatFieldValue(row.values[colIdx]);
+//             message += QString("| %1 ").arg(str.leftJustified(15, ' '));
+//         }
+//         message += "|\n";
+//     }
+//     message += QString("+-----------------").repeated(columnIndices.size()) + "+";
+
+//     widget->showMessage(message);
+// }
+void TupleManager::selectColumns(const SelectColumnsOperation* op) {
+    auto fields = FileUtil::readTableFields(op->dbName, op->tableName);
+    auto rows = FileUtil::readAllDataRows(op->dbName, op->tableName);
+
+    std::vector<int> columnIndices;
     std::vector<bool> isAggregateColumn;
 
-    // 2. 验证列名并构建索引映射
-    std::vector<int> columnIndices;
     for (const QString& col : op->columns) {
         bool found = false;
         for (size_t i = 0; i < fields.size(); ++i) {
@@ -321,100 +436,23 @@ void TupleManager::selectColumns(const SelectColumnsOperation* op) {
         if (!found) throw std::runtime_error("Column not found: " + col.toStdString());
     }
 
-    // 2.5 Apply WHERE filter first
+    // Filter rows using WHERE clause
     std::vector<DataRow> resultRows;
-    for (const auto& row : allRows) {
-        bool matchAllConditions = true;
+    TupleManager temp;
+    for (const auto& row : rows) {
 
-        // WHERE条件判断
-        for (const auto& cond : op->conditions) {
-            int fieldIdx = -1;
-            for (size_t i = 0; i < fields.size(); i++) {
-                if (strcmp(fields[i].name, cond.fieldName) == 0) {
-                    fieldIdx = i;
-                    break;
-                }
-            }
-
-            // if (fieldIdx == -1 || !cond.evaluate(row.values[fieldIdx])) {
-            //     matchAllConditions = false;
-            //     break;
-            // }  // 无条件则抛出异常
-            // if (fieldIdx == -1) continue; // 跳过无效条件
-            if (fieldIdx == -1) {
-                matchAllConditions = false;
-                break;
-            }
-        }
-
-        if (matchAllConditions) {
+        if (temp.matchesWhereConditions(row, fields, op->conditions)) {
             resultRows.push_back(row);
         }
     }
 
-    // Now decide whether to compute aggregates or just print values
-    if (std::any_of(isAggregateColumn.begin(), isAggregateColumn.end(), [](bool b){ return b; })) {
-        TupleManager manager;
-        manager.handleAggregateSelect(op, fields, allRows, columnIndices);
+    // Decide whether to compute aggregates
+    if (std::any_of(isAggregateColumn.begin(), isAggregateColumn.end(),
+                    [](bool b){ return b; })) {
+        temp.handleAggregateSelect(op, fields, resultRows, columnIndices);
     } else {
-        TupleManager manager;
-        manager.handleRegularSelect(op, fields, allRows, columnIndices);
+        temp.handleRegularSelect(op, fields, resultRows, columnIndices);
     }
-
-    // // 3. 过滤数据
-    // std::vector<DataRow> resultRows;
-    // for (const auto& row : allRows) {
-    //     bool matchAllConditions = true;
-        
-    //     // WHERE条件判断
-    //     for (const auto& cond : op->conditions) {
-    //         int fieldIdx = -1;
-    //         for (size_t i = 0; i < fields.size(); i++) {
-    //             if (strcmp(fields[i].name, cond.fieldName) == 0) {
-    //                 fieldIdx = i;
-    //                 break;
-    //             }
-    //         }
-            
-    //         // if (fieldIdx == -1 || !cond.evaluate(row.values[fieldIdx])) {
-    //         //     matchAllConditions = false;
-    //         //     break;
-    //         // }  // 无条件则抛出异常
-    //         if (fieldIdx == -1) continue; // 跳过无效条件
-    //     }
-
-    //     if (matchAllConditions) {
-    //         resultRows.push_back(row);
-    //     }
-    // }
-
-    // 4. 构建输出
-    QString message = QString("+-----------------").repeated(columnIndices.size()) + "+\n";
-    
-    // 表头
-    for (const QString& col : op->columns) {
-        message += QString("| %1 ").arg(col.leftJustified(15, ' '));
-    }
-    message += "|\n" + QString("+-----------------").repeated(columnIndices.size()) + "+\n";
-
-    if (resultRows.empty()) {
-        message = "No rows match the conditions";
-    } // 友好提示
-
-    // 数据行
-    for (const auto& row : resultRows) {
-        for (int colIdx : columnIndices) {
-            const FieldValue& val = row.values[colIdx];;
-            /* 值格式化逻辑（见上文实现） */
-            TupleManager tempManager;
-            QString str = tempManager.formatFieldValue(row.values[colIdx]);
-            message += QString("| %1 ").arg(str.leftJustified(15, ' '));
-        }
-        message += "|\n";
-    }
-    message += QString("+-----------------").repeated(columnIndices.size()) + "+";
-
-    widget->showMessage(message);
 }
 
 // simplied sample
@@ -610,211 +648,301 @@ void TupleManager::selectColumns(const SelectColumnsOperation* op) {
 FieldValue TupleManager::calculateFunction(
     const FieldBlock& funcField,
     const std::vector<FieldBlock>& allFields,
-    const std::vector<DataRow>& rows
-    ) {
+    const std::vector<DataRow>& rows)
+{
     FieldValue result;
     memset(&result, 0, sizeof(FieldValue));
 
-    // 如果不是聚合函数字段，直接返回空值
     if (!funcField.isAggregateFunc) return result;
 
-    // 获取函数信息（直接从FieldBlock中读取）
     const FunctionCall& func = funcField.func;
+    int targetIndex = -1;
 
-    // 查找目标字段索引（COUNT(*) 除外）
-    int targetFieldIndex = -1;
     if (strcmp(func.fieldName, "*") != 0) {
-        for (size_t i = 0; i < allFields.size(); i++) {
+        for (size_t i = 0; i < allFields.size(); ++i) {
             if (strcmp(allFields[i].name, func.fieldName) == 0) {
-                targetFieldIndex = i;
+                targetIndex = i;
                 break;
             }
         }
-        if (targetFieldIndex == -1) {
-            throw std::runtime_error(
-                QString("Field not found: %1").arg(func.fieldName).toStdString()
-                );
+        if (targetIndex == -1) {
+            throw std::runtime_error("Field not found");
         }
     }
 
 
-
-    // 类型安全检查
     switch (func.funcType) {
     case FT_COUNT:
-        // COUNT 不限制字段类型
+        if (targetIndex == -1) {
+            result.type = DT_INTEGER;
+            result.intVal = rows.size();
+        } else {
+            result.type = DT_INTEGER;
+            result.intVal = std::count_if(rows.begin(), rows.end(),
+                                          [&](const DataRow& r) {
+                                              return r.values[targetIndex].type != DT_NULL;
+                                          });
+        }
         break;
 
     case FT_MAX:
+        if (targetIndex >= 0 && !rows.empty()) {
+            auto maxIt = std::max_element(rows.begin(), rows.end(),
+                                          [targetIndex](const DataRow& a, const DataRow& b) {
+                                              TupleManager temp;
+                                              return temp.compareFieldValues(a.values[targetIndex],
+                                                                        b.values[targetIndex]) < 0;
+                                          });
+            result = maxIt->values[targetIndex];
+        }
+        break;
+
     case FT_MIN:
-        // 可比较类型：数值、字符串、日期时间
-        if (targetFieldIndex != -1 &&
-            allFields[targetFieldIndex].type == DT_BOOL) {
-            throw std::runtime_error(
-                QString("Function %1 cannot apply to boolean field: %2")
-                    .arg(func.funcName).arg(func.fieldName).toStdString()
-                );
+        if (targetIndex >= 0 && !rows.empty()) {
+            auto minIt = std::min_element(rows.begin(), rows.end(),
+                                          [targetIndex](const DataRow& a, const DataRow& b) {
+                                              TupleManager temp;
+                                              return temp.compareFieldValues(a.values[targetIndex],
+                                                                        b.values[targetIndex]) < 0;
+                                          });
+            result = minIt->values[targetIndex];
         }
         break;
 
     case FT_AVG:
     case FT_SUM:
-        // 仅限数值类型
-        if (targetFieldIndex != -1 &&
-            !(allFields[targetFieldIndex].type == DT_INTEGER ||
-              allFields[targetFieldIndex].type == DT_DOUBLE)) {
-            throw std::runtime_error(
-                QString("Function %1 requires numeric field: %2")
-                    .arg(func.funcName).arg(func.fieldName).toStdString()
-                );
-        }
-        break;
-    }
-
-    // 执行计算
-    switch (func.funcType) {
-    case FT_COUNT: {
-        result.type = DT_INTEGER;
-        if (targetFieldIndex == -1) {
-            // COUNT(*)
-            result.intVal = rows.size();
-        } else {
-            // COUNT(field)
-            result.intVal = std::count_if(rows.begin(), rows.end(),
-                                          [&](const DataRow& row) {
-                                              return row.values[targetFieldIndex].type != DT_NULL;
-                                          });
-        }
-        break;
-    }
-
-    case FT_MAX: {
-        if (targetFieldIndex == -1 || rows.empty()) break;
-
-        auto maxIt = std::max_element(rows.begin(), rows.end(),
-                                      [&](const DataRow& a, const DataRow& b) {
-                                          return compareFieldValues(
-                                                     a.values[targetFieldIndex],
-                                                     b.values[targetFieldIndex]) < 0;
-                                      });
-
-        // 处理全NULL的情况
-        if (maxIt->values[targetFieldIndex].type != DT_NULL) {
-            result = maxIt->values[targetFieldIndex];
-        }
-        break;
-    }
-
-    case FT_MIN: {
-        if (targetFieldIndex == -1 || rows.empty()) break;
-
-        auto minIt = std::min_element(rows.begin(), rows.end(),
-                                      [&](const DataRow& a, const DataRow& b) {
-                                          return compareFieldValues(
-                                                     a.values[targetFieldIndex],
-                                                     b.values[targetFieldIndex]) < 0;
-                                      });
-
-        if (minIt->values[targetFieldIndex].type != DT_NULL) {
-            result = minIt->values[targetFieldIndex];
-        }
-        break;
-    }
-
-    case FT_AVG: {
-        if (targetFieldIndex == -1) break;
-
         double total = 0.0;
-        int validCount = 0;
-        bool isIntegerSource = (allFields[targetFieldIndex].type == DT_INTEGER);
-
+        int count = 0;
         for (const auto& row : rows) {
-            const FieldValue& val = row.values[targetFieldIndex];
-            if (val.type == DT_NULL) continue;
-
-            switch (val.type) {
-            case DT_INTEGER:
+            FieldValue val = row.values[targetIndex];
+            if (val.type == DT_INTEGER) {
                 total += val.intVal;
-                validCount++;
-                break;
-            case DT_DOUBLE:
+                count++;
+            } else if (val.type == DT_DOUBLE) {
                 total += val.doubleVal;
-                validCount++;
-                break;
-            default:
-                continue;
+                count++;
             }
         }
-
-        if (validCount > 0) {
-            result.type = DT_DOUBLE;
-            result.doubleVal = total / validCount;
-            // 如果源都是整数且能整除，转为整数
-            if (isIntegerSource && floor(result.doubleVal) == result.doubleVal) {
-                result.type = DT_INTEGER;
-                result.intVal = static_cast<qint32>(result.doubleVal);
-            }
+        if (count > 0) {
+            result.type = (func.funcType == FT_AVG) ? DT_DOUBLE : DT_INTEGER;
+            result.doubleVal = (func.funcType == FT_AVG) ? total / count : total;
         }
         break;
-    }
 
-    case FT_SUM: {
-        if (targetFieldIndex == -1) break;
-
-        double sum = 0.0;
-        bool hasValue = false;
-        bool isIntegerSource = (allFields[targetFieldIndex].type == DT_INTEGER);
-        bool overflow = false;
-
-        for (const auto& row : rows) {
-            const FieldValue& val = row.values[targetFieldIndex];
-            if (val.type == DT_NULL) continue;
-
-            switch (val.type) {
-            case DT_INTEGER:
-                if (isIntegerSource) {
-                    // 检查整数溢出
-                    if (val.intVal > 0 &&
-                        sum > std::numeric_limits<qint32>::max() - val.intVal) {
-                        overflow = true;
-                    } else if (val.intVal < 0 &&
-                               sum < std::numeric_limits<qint32>::min() - val.intVal) {
-                        overflow = true;
-                    }
-                }
-                sum += val.intVal;
-                hasValue = true;
-                break;
-            case DT_DOUBLE:
-                sum += val.doubleVal;
-                hasValue = true;
-                break;
-            default:
-                continue;
-            }
-        }
-
-        if (hasValue) {
-            if (isIntegerSource && !overflow) {
-                result.type = DT_INTEGER;
-                result.intVal = static_cast<qint32>(sum);
-            } else {
-                result.type = DT_DOUBLE;
-                result.doubleVal = sum;
-            }
-        }
-        break;
-    }
-
-    default:
-        // result.type = DT_NULL;
-        throw std::runtime_error(
-            QString("Unsupported function: %1").arg(func.funcName).toStdString()
-            );
+    // default:
+    //     throw std::runtime_error("Unsupported function"); // 什么鬼问题
     }
 
     return result;
 }
+// FieldValue TupleManager::calculateFunction(
+//     const FieldBlock& funcField,
+//     const std::vector<FieldBlock>& allFields,
+//     const std::vector<DataRow>& rows
+//     ) {
+//     FieldValue result;
+//     memset(&result, 0, sizeof(FieldValue));
+
+//     // 如果不是聚合函数字段，直接返回空值
+//     if (!funcField.isAggregateFunc) return result;
+
+//     // 获取函数信息（直接从FieldBlock中读取）
+//     const FunctionCall& func = funcField.func;
+
+//     // 查找目标字段索引（COUNT(*) 除外）
+//     int targetFieldIndex = -1;
+//     if (strcmp(func.fieldName, "*") != 0) {
+//         for (size_t i = 0; i < allFields.size(); i++) {
+//             if (strcmp(allFields[i].name, func.fieldName) == 0) {
+//                 targetFieldIndex = i;
+//                 break;
+//             }
+//         }
+//         if (targetFieldIndex == -1) {
+//             throw std::runtime_error(
+//                 QString("Field not found: %1").arg(func.fieldName).toStdString()
+//                 );
+//         }
+//     }
+
+
+
+//     // 类型安全检查
+//     switch (func.funcType) {
+//     case FT_COUNT:
+//         // COUNT 不限制字段类型
+//         break;
+
+//     case FT_MAX:
+//     case FT_MIN:
+//         // 可比较类型：数值、字符串、日期时间
+//         if (targetFieldIndex != -1 &&
+//             allFields[targetFieldIndex].type == DT_BOOL) {
+//             throw std::runtime_error(
+//                 QString("Function %1 cannot apply to boolean field: %2")
+//                     .arg(func.funcName).arg(func.fieldName).toStdString()
+//                 );
+//         }
+//         break;
+
+//     case FT_AVG:
+//     case FT_SUM:
+//         // 仅限数值类型
+//         if (targetFieldIndex != -1 &&
+//             !(allFields[targetFieldIndex].type == DT_INTEGER ||
+//               allFields[targetFieldIndex].type == DT_DOUBLE)) {
+//             throw std::runtime_error(
+//                 QString("Function %1 requires numeric field: %2")
+//                     .arg(func.funcName).arg(func.fieldName).toStdString()
+//                 );
+//         }
+//         break;
+//     }
+
+//     // 执行计算
+//     switch (func.funcType) {
+//     case FT_COUNT: {
+//         result.type = DT_INTEGER;
+//         if (targetFieldIndex == -1) {
+//             // COUNT(*)
+//             result.intVal = rows.size();
+//         } else {
+//             // COUNT(field)
+//             result.intVal = std::count_if(rows.begin(), rows.end(),
+//                                           [&](const DataRow& row) {
+//                                               return row.values[targetFieldIndex].type != DT_NULL;
+//                                           });
+//         }
+//         break;
+//     }
+
+//     case FT_MAX: {
+//         if (targetFieldIndex == -1 || rows.empty()) break;
+
+//         auto maxIt = std::max_element(rows.begin(), rows.end(),
+//                                       [&](const DataRow& a, const DataRow& b) {
+//                                           return compareFieldValues(
+//                                                      a.values[targetFieldIndex],
+//                                                      b.values[targetFieldIndex]) < 0;
+//                                       });
+
+//         // 处理全NULL的情况
+//         if (maxIt->values[targetFieldIndex].type != DT_NULL) {
+//             result = maxIt->values[targetFieldIndex];
+//         }
+//         break;
+//     }
+
+//     case FT_MIN: {
+//         if (targetFieldIndex == -1 || rows.empty()) break;
+
+//         auto minIt = std::min_element(rows.begin(), rows.end(),
+//                                       [&](const DataRow& a, const DataRow& b) {
+//                                           return compareFieldValues(
+//                                                      a.values[targetFieldIndex],
+//                                                      b.values[targetFieldIndex]) < 0;
+//                                       });
+
+//         if (minIt->values[targetFieldIndex].type != DT_NULL) {
+//             result = minIt->values[targetFieldIndex];
+//         }
+//         break;
+//     }
+
+//     case FT_AVG: {
+//         if (targetFieldIndex == -1) break;
+
+//         double total = 0.0;
+//         int validCount = 0;
+//         bool isIntegerSource = (allFields[targetFieldIndex].type == DT_INTEGER);
+
+//         for (const auto& row : rows) {
+//             const FieldValue& val = row.values[targetFieldIndex];
+//             if (val.type == DT_NULL) continue;
+
+//             switch (val.type) {
+//             case DT_INTEGER:
+//                 total += val.intVal;
+//                 validCount++;
+//                 break;
+//             case DT_DOUBLE:
+//                 total += val.doubleVal;
+//                 validCount++;
+//                 break;
+//             default:
+//                 continue;
+//             }
+//         }
+
+//         if (validCount > 0) {
+//             result.type = DT_DOUBLE;
+//             result.doubleVal = total / validCount;
+//             // 如果源都是整数且能整除，转为整数
+//             if (isIntegerSource && floor(result.doubleVal) == result.doubleVal) {
+//                 result.type = DT_INTEGER;
+//                 result.intVal = static_cast<qint32>(result.doubleVal);
+//             }
+//         }
+//         break;
+//     }
+
+//     case FT_SUM: {
+//         if (targetFieldIndex == -1) break;
+
+//         double sum = 0.0;
+//         bool hasValue = false;
+//         bool isIntegerSource = (allFields[targetFieldIndex].type == DT_INTEGER);
+//         bool overflow = false;
+
+//         for (const auto& row : rows) {
+//             const FieldValue& val = row.values[targetFieldIndex];
+//             if (val.type == DT_NULL) continue;
+
+//             switch (val.type) {
+//             case DT_INTEGER:
+//                 if (isIntegerSource) {
+//                     // 检查整数溢出
+//                     if (val.intVal > 0 &&
+//                         sum > std::numeric_limits<qint32>::max() - val.intVal) {
+//                         overflow = true;
+//                     } else if (val.intVal < 0 &&
+//                                sum < std::numeric_limits<qint32>::min() - val.intVal) {
+//                         overflow = true;
+//                     }
+//                 }
+//                 sum += val.intVal;
+//                 hasValue = true;
+//                 break;
+//             case DT_DOUBLE:
+//                 sum += val.doubleVal;
+//                 hasValue = true;
+//                 break;
+//             default:
+//                 continue;
+//             }
+//         }
+
+//         if (hasValue) {
+//             if (isIntegerSource && !overflow) {
+//                 result.type = DT_INTEGER;
+//                 result.intVal = static_cast<qint32>(sum);
+//             } else {
+//                 result.type = DT_DOUBLE;
+//                 result.doubleVal = sum;
+//             }
+//         }
+//         break;
+//     }
+
+//     default:
+//         // result.type = DT_NULL;
+//         throw std::runtime_error(
+//             QString("Unsupported function: %1").arg(func.funcName).toStdString()
+//             );
+//     }
+
+//     return result;
+// }
 
 // 比较两个FieldValue
 int TupleManager::compareFieldValues(const FieldValue& v1, const FieldValue& v2) const{
@@ -841,6 +969,17 @@ int TupleManager::compareFieldValues(const FieldValue& v1, const FieldValue& v2)
     //                              Try type coercion before comparing different types (if needed by your SQL dialect).
 }
 
+// int compareFieldValues(const FieldValue& a, const FieldValue& b) {
+//     if (a.type != b.type) return a.type - b.type;
+
+//     switch (a.type) {
+//     case DT_INTEGER: return (a.intVal < b.intVal) ? -1 : (a.intVal > b.intVal) ? 1 : 0;
+//     case DT_DOUBLE: return (a.doubleVal < b.doubleVal) ? -1 : (a.doubleVal > b.doubleVal) ? 1 : 0;
+//     case DT_VARCHAR: return strcmp(a.varcharVal, b.varcharVal);
+//     default: return 0;
+//     }
+// }
+
 QString TupleManager::formatValue(const FieldValue& val, DataType type) {
     switch (type) {
     case DT_INTEGER: return QString::number(val.intVal);
@@ -851,6 +990,39 @@ QString TupleManager::formatValue(const FieldValue& val, DataType type) {
     }
 }
 
+
+
+// void TupleManager::handleAggregateSelect(
+//     const SelectColumnsOperation* op,
+//     const std::vector<FieldBlock>& fields,
+//     const std::vector<DataRow>& rows,
+//     const std::vector<int>& columnIndices)
+// {
+//     QStringList headerLabels;
+//     QList<FieldValue> results;
+
+//     for (int idx : columnIndices) {
+//         const FieldBlock& field = fields[idx];
+//         if (field.isAggregateFunc) {
+//             headerLabels << field.name;
+//             results.append(calculateFunction(field, fields, rows));
+//         }
+//     }
+
+//     // Format and display the result
+//     QString message = "+-" + QString("-+-").repeated(headerLabels.size() - 1) + "-+\n";
+//     message += "| " + headerLabels.join(" | ") + " |\n";
+//     message += "+-" + QString("-+-").repeated(headerLabels.size() - 1) + "-+\n";
+
+
+//     message += "| ";
+//     for (const FieldValue& val : results) {
+//         message += formatFunctionValue(val) + " | ";
+//     }
+//     message += "\n+-------------------------------------------+\n";
+
+//     widget->showMessage(message);
+// }
 void TupleManager::handleAggregateSelect(
     const SelectColumnsOperation* op,
     const std::vector<FieldBlock>& fields,
@@ -868,11 +1040,10 @@ void TupleManager::handleAggregateSelect(
         }
     }
 
-    // Format and display the result
+    // Format output
     QString message = "+-" + QString("-+-").repeated(headerLabels.size() - 1) + "-+\n";
     message += "| " + headerLabels.join(" | ") + " |\n";
     message += "+-" + QString("-+-").repeated(headerLabels.size() - 1) + "-+\n";
-
 
     message += "| ";
     for (const FieldValue& val : results) {
@@ -946,4 +1117,32 @@ void TupleManager::handleRegularSelect(
     message += "+-" + QString("-+-").repeated(dashes) + "-+";
 
     widget->showMessage(message);
+}
+
+bool TupleManager::matchesWhereConditions(const DataRow& row,
+                                          const std::vector<FieldBlock>& fields,
+                                          const std::vector<Condition>& conditions) const {
+    for (const auto& cond : conditions) {
+        int fieldIdx = -1;
+
+        // Find the index of the field by name
+        for (size_t i = 0; i < fields.size(); ++i) {
+            if (strcmp(fields[i].name, cond.fieldName) == 0) {
+                fieldIdx = i;
+                break;
+            }
+        }
+
+        // If field not found, skip condition
+        if (fieldIdx == -1 || fieldIdx >= static_cast<int>(row.values.size())) {
+            continue;
+        }
+
+        // Evaluate the condition against the row value
+        if (!cond.evaluate(row.values[fieldIdx])) {
+            return false; // Condition failed
+        }
+    }
+
+    return true; // All conditions passed
 }

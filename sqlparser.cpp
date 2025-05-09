@@ -233,15 +233,20 @@ Operation* SqlParser::parse(const QString& sql) {
     // 在 SqlParser::parse() 中添加新的匹配模式
 static QRegularExpression selectColumnsRegex(
     "^SELECT\\s+(.+?)\\s+FROM\\s+(\\w+)(?:\\s+WHERE\\s+(.+))?\\s*;$",
-    QRegularExpression::CaseInsensitiveOption
+        QRegularExpression::CaseInsensitiveOption |
+            QRegularExpression::MultilineOption
 );
 
+
 // 解析示例：SELECT id, name FROM users WHERE age > 18;
-//QRegularExpressionMatch match = selectColumnsRegex.match(sql);
-if (match.hasMatch()) {
-    QStringList columns = match.captured(1).split(',', Qt::SkipEmptyParts);
-    QString tableName = match.captured(2).trimmed();
-    QString whereClause = match.captured(3).trimmed();
+QRegularExpressionMatch whereSelectMatch = selectColumnsRegex.match(sql);
+if (whereSelectMatch.hasMatch() || whereSelectMatch.isValid()) { // valid new added
+    QStringList columns = whereSelectMatch.captured(1).split(',', Qt::SkipEmptyParts);
+    for (auto& col : columns) {
+        col = col.trimmed();
+    } // new added
+    QString tableName = whereSelectMatch.captured(2).trimmed();
+    QString whereClause = whereSelectMatch.captured(3).trimmed();
     
     // 创建操作对象
     QString dbName = currentDB;
@@ -261,18 +266,25 @@ if (match.hasMatch()) {
 QList<FieldBlock> SqlParser::extractFields(const QString& tableDefinition) {
     QList<FieldBlock> fields;
 
-    // 第一阶段：解析普通字段定义
+    //第一阶段：解析普通字段定义
     static QRegularExpression fieldRegex(
         "(\\w+)\\s+(\\w+)(\\((\\d+)\\))?\\s*(PRIMARY KEY|NOT NULL|UNIQUE|DEFAULT\\s+[^,]+|AUTO_INCREMENT|"
         "FOREIGN KEY\\s+REFERENCES\\s+(\\w+)\\s*\\((\\w+)\\)|CHECK\\s*\\(([^,]+)\\))?\\s*,?",
         QRegularExpression::CaseInsensitiveOption
         );
+    // 改进后的正则表达式（防止空匹配）
+    // static QRegularExpression fieldRegex(
+    //     "(\\w+)\\s+(\\w+)(\\((\\d+)\\))?\\s*"
+    //     "(?:PRIMARY KEY|NOT NULL|UNIQUE|DEFAULT\\s+[^,]*|AUTO_INCREMENT|"
+    //     "FOREIGN KEY\\s+REFERENCES\\s+(\\w+)\\s*\\((\\w+)\\)|CHECK\\s*\\([^)]*\\))?\\s*"
+    //     "(?=,|$)",
+    //     QRegularExpression::CaseInsensitiveOption | QRegularExpression::MultilineOption);
 
-    // 第二阶段：解析聚合函数（如COUNT(*), MAX(age)）
+    // 匹配聚合函数
     static QRegularExpression funcRegex(
         "(\\w+)\\(\\s*([\\w\\*]+)\\s*\\)",
-        QRegularExpression::CaseInsensitiveOption
-        );
+        QRegularExpression::CaseInsensitiveOption);
+
 
     // 先处理普通字段定义
     QRegularExpressionMatchIterator fieldIter = fieldRegex.globalMatch(tableDefinition);
@@ -280,6 +292,7 @@ QList<FieldBlock> SqlParser::extractFields(const QString& tableDefinition) {
         QRegularExpressionMatch match = fieldIter.next();
         FieldBlock field;
         memset(&field, 0, sizeof(FieldBlock));
+        field.isAggregateFunc = false;
         field.order = fields.size() + 1; // 字段顺序从 1 开始
         QString fieldName = match.captured(1).trimmed();
         QString fieldType = match.captured(2).trimmed();
@@ -349,30 +362,57 @@ QList<FieldBlock> SqlParser::extractFields(const QString& tableDefinition) {
         fields.append(field);
     }
     // 单独处理聚合函数（新增逻辑）
+    // QRegularExpressionMatchIterator funcIter = funcRegex.globalMatch(tableDefinition);
+    // while (funcIter.hasNext()) {
+    //     QRegularExpressionMatch match = funcIter.next();
+    //     FieldBlock funcField;
+    //     memset(&funcField, 0, sizeof(FieldBlock));
+
+    //     // 设置函数信息
+    //     QString funcName = match.captured(1).toUpper();
+    //     QString fieldName = match.captured(2).trimmed();
+
+    //     // 填充FunctionCall结构
+    //     strncpy(funcField.func.funcName, funcName.toUtf8().constData(), 32);
+    //     strncpy(funcField.func.fieldName, fieldName.toUtf8().constData(), 128);
+
+    //     // 设置函数类型（与原有枚举值匹配）
+    //     if (funcName == "COUNT") funcField.func.funcType = FT_COUNT;
+    //     else if (funcName == "MAX") funcField.func.funcType = FT_MAX;
+    //     else if (funcName == "MIN") funcField.func.funcType = FT_MIN;
+    //     else if (funcName == "AVG") funcField.func.funcType = FT_AVG;
+    //     else if (funcName == "SUM") funcField.func.funcType = FT_SUM;
+    //     else continue; // 匹配不上就不匹配了
+
+    //     // 设置字段元数据
+    //     funcField.order = fields.size() + 1;
+    //     snprintf(funcField.name, 128, "%s(%s)", funcName.toUtf8().constData(), fieldName.toUtf8().constData());
+    //     funcField.type = (funcField.func.funcType == FT_COUNT) ? DT_INTEGER : DT_DOUBLE;
+    //     funcField.isAggregateFunc = true;
+
+    //     fields.append(funcField);
+    // }
     QRegularExpressionMatchIterator funcIter = funcRegex.globalMatch(tableDefinition);
     while (funcIter.hasNext()) {
         QRegularExpressionMatch match = funcIter.next();
         FieldBlock funcField;
         memset(&funcField, 0, sizeof(FieldBlock));
-
-        // 设置函数信息
         QString funcName = match.captured(1).toUpper();
         QString fieldName = match.captured(2).trimmed();
 
-        // 填充FunctionCall结构
-        strncpy(funcField.func.funcName, funcName.toUtf8().constData(), 32);
-        strncpy(funcField.func.fieldName, fieldName.toUtf8().constData(), 128);
+        // Set FunctionCall info
+        strncpy(funcField.func.funcName, funcName.toUtf8().constData(), 31);
+        strncpy(funcField.func.fieldName, fieldName.toUtf8().constData(), 127);
 
-        // 设置函数类型（与原有枚举值匹配）
         if (funcName == "COUNT") funcField.func.funcType = FT_COUNT;
         else if (funcName == "MAX") funcField.func.funcType = FT_MAX;
         else if (funcName == "MIN") funcField.func.funcType = FT_MIN;
         else if (funcName == "AVG") funcField.func.funcType = FT_AVG;
         else if (funcName == "SUM") funcField.func.funcType = FT_SUM;
 
-        // 设置字段元数据
+        // Set metadata
         funcField.order = fields.size() + 1;
-        snprintf(funcField.name, 128, "%s(%s)", funcName.toUtf8().constData(), fieldName.toUtf8().constData());
+        snprintf(funcField.name, 127, "%s(%s)", funcName.toUtf8().constData(), fieldName.toUtf8().constData());
         funcField.type = (funcField.func.funcType == FT_COUNT) ? DT_INTEGER : DT_DOUBLE;
         funcField.isAggregateFunc = true;
 
