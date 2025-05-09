@@ -233,18 +233,20 @@ Operation* SqlParser::parse(const QString& sql) {
     // 在 SqlParser::parse() 中添加新的匹配模式
 static QRegularExpression selectColumnsRegex(
     "^SELECT\\s+(.+?)\\s+FROM\\s+(\\w+)(?:\\s+WHERE\\s+(.+))?\\s*;$",
-    QRegularExpression::CaseInsensitiveOption
+        QRegularExpression::CaseInsensitiveOption |
+            QRegularExpression::MultilineOption
 );
 
+
 // 解析示例：SELECT id, name FROM users WHERE age > 18;
-//QRegularExpressionMatch match = selectColumnsRegex.match(sql);
-if (match.hasMatch()) {
-    QStringList columns = match.captured(1).split(',', Qt::SkipEmptyParts);
+QRegularExpressionMatch whereSelectMatch = selectColumnsRegex.match(sql);
+if (whereSelectMatch.hasMatch() || whereSelectMatch.isValid()) { // valid new added
+    QStringList columns = whereSelectMatch.captured(1).split(',', Qt::SkipEmptyParts);
     for (auto& col : columns) {
         col = col.trimmed();
     } // new added
-    QString tableName = match.captured(2).trimmed();
-    QString whereClause = match.captured(3).trimmed();
+    QString tableName = whereSelectMatch.captured(2).trimmed();
+    QString whereClause = whereSelectMatch.captured(3).trimmed();
     
     // 创建操作对象
     QString dbName = currentDB;
