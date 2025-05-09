@@ -6,9 +6,9 @@ extern QString currentDB;
 CreateTableOperation::CreateTableOperation(QString tableName, QList<FieldBlock> fields) {
     // 获取表定义文件
     for (FieldBlock fieldBlock : fields) {
-        if(fieldBlock.isAggregateFunc) {
-            throw std::runtime_error("创建操作中不能有聚合函数");
-        }
+        // if(fieldBlock.isAggregateFunc) {
+        //     throw std::runtime_error("创建操作中不能有聚合函数");
+        // }
         field_blocks.push_back(fieldBlock);
         extractIntegrityConstraints(fieldBlock);
         // if (strlen(fieldBlock.ref_field)){
