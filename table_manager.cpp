@@ -8,15 +8,15 @@ extern Widget* widget;
 extern QString currentDB;
 // 管理创建表操作
 void TableManager::createTable(const CreateTableOperation* operation) {
-    // 校验字段
-    for (const auto& field : operation->field_blocks) {
-        if (field.isAggregateFunc) {
-            throw std::runtime_error(
-                "Aggregate function cannot be used in table definition: " +
-                QString(field.name).toStdString()
-                );
-        }
-    }
+    // // 校验字段
+    // for (const auto& field : operation->field_blocks) {
+    //     if (field.isAggregateFunc) {
+    //         throw std::runtime_error(
+    //             "Aggregate function cannot be used in table definition: " +
+    //             QString(field.name).toStdString()
+    //             );
+    //     }
+    // }
 
     QString tableName = operation->table_block.name;
     QString dbName = operation->dbName;
