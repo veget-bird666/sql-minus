@@ -1036,3 +1036,31 @@ void TupleManager::handleRegularSelect(
 
     widget->showMessage(message);
 }
+
+bool TupleManager::matchesWhereConditions(const DataRow& row,
+                                          const std::vector<FieldBlock>& fields,
+                                          const std::vector<Condition>& conditions) const {
+    for (const auto& cond : conditions) {
+        int fieldIdx = -1;
+
+        // Find the index of the field by name
+        for (size_t i = 0; i < fields.size(); ++i) {
+            if (strcmp(fields[i].name, cond.fieldName) == 0) {
+                fieldIdx = i;
+                break;
+            }
+        }
+
+        // If field not found, skip condition
+        if (fieldIdx == -1 || fieldIdx >= static_cast<int>(row.values.size())) {
+            continue;
+        }
+
+        // Evaluate the condition against the row value
+        if (!cond.evaluate(row.values[fieldIdx])) {
+            return false; // Condition failed
+        }
+    }
+
+    return true; // All conditions passed
+}
