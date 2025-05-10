@@ -8,6 +8,7 @@
 #include <cstring>
 #include <QDebug>
 #include "structures.h"
+#include <QRegularExpression>
 
 extern Widget* widget;
 
@@ -416,44 +417,187 @@ QString formatFunctionValue(const FieldValue& val) {
 
 //     widget->showMessage(message);
 // }
+
 void TupleManager::selectColumns(const SelectColumnsOperation* op) {
     auto fields = FileUtil::readTableFields(op->dbName, op->tableName);
     auto rows = FileUtil::readAllDataRows(op->dbName, op->tableName);
 
-    std::vector<int> columnIndices;
+    std::vector<int> realColumnIndices;     // Indices of real table fields
+    std::vector<FieldBlock> virtualFields;   // Virtual fields like MAX(age)
     std::vector<bool> isAggregateColumn;
 
+    // 1. Parse all requested columns
     for (const QString& col : op->columns) {
         bool found = false;
+
+        // First try to match column name against actual schema
         for (size_t i = 0; i < fields.size(); ++i) {
             if (QString::fromUtf8(fields[i].name) == col.trimmed()) {
-                columnIndices.push_back(i);
+                realColumnIndices.push_back(i);
                 isAggregateColumn.push_back(fields[i].isAggregateFunc);
                 found = true;
                 break;
             }
         }
-        if (!found) throw std::runtime_error("Column not found: " + col.toStdString());
+
+        // If not found, check if it's an aggregate function
+        if (!found) {
+            QRegularExpression funcRegex("(\\w+)\\(\\s*([\\w\\*]+)\\s*\\)");
+            QRegularExpressionMatch match = funcRegex.match(col);
+
+            if (match.hasMatch()) {
+                FieldBlock virtualField;
+                memset(&virtualField, 0, sizeof(FieldBlock));
+
+                QString funcName = match.captured(1).toUpper();
+                QString fieldName = match.captured(2).trimmed();
+
+                strncpy(virtualField.name, col.toUtf8().constData(), 127);
+                virtualField.isAggregateFunc = true;
+
+                // Fill FunctionCall struct
+                strncpy(virtualField.func.funcName, funcName.toUtf8().constData(), 31);
+                strncpy(virtualField.func.fieldName, fieldName.toUtf8().constData(), 127);
+
+                if (funcName == "COUNT") virtualField.func.funcType = FT_COUNT;
+                else if (funcName == "MAX") virtualField.func.funcType = FT_MAX;
+                else if (funcName == "MIN") virtualField.func.funcType = FT_MIN;
+                else if (funcName == "AVG") virtualField.func.funcType = FT_AVG;
+                else if (funcName == "SUM") virtualField.func.funcType = FT_SUM;
+
+                virtualField.type = (funcName == "COUNT") ? DT_INTEGER : DT_DOUBLE;
+
+                virtualFields.push_back(virtualField);
+                isAggregateColumn.push_back(true);
+                found = true;
+            }
+        }
+
+        if (!found) {
+            throw std::runtime_error("Column not found: " + col.toStdString());
+        }
     }
 
-    // Filter rows using WHERE clause
+    // 2. Filter rows using WHERE clause
     std::vector<DataRow> resultRows;
     TupleManager temp;
     for (const auto& row : rows) {
-
         if (temp.matchesWhereConditions(row, fields, op->conditions)) {
             resultRows.push_back(row);
         }
     }
 
-    // Decide whether to compute aggregates
-    if (std::any_of(isAggregateColumn.begin(), isAggregateColumn.end(),
-                    [](bool b){ return b; })) {
-        temp.handleAggregateSelect(op, fields, resultRows, columnIndices);
+    // 3. Decide whether to compute aggregates
+    bool hasAggregates = std::any_of(isAggregateColumn.begin(), isAggregateColumn.end(),
+                                     [](bool b){ return b; });
+
+    if (hasAggregates) {
+        temp.handleAggregateSelect(op, fields, virtualFields, resultRows);
     } else {
-        temp.handleRegularSelect(op, fields, resultRows, columnIndices);
+        temp.handleRegularSelect(op, fields, resultRows, realColumnIndices);
     }
 }
+// void TupleManager::selectColumns(const SelectColumnsOperation* op) {
+//     auto fields = FileUtil::readTableFields(op->dbName, op->tableName);
+//     auto rows = FileUtil::readAllDataRows(op->dbName, op->tableName);
+
+//     std::vector<int> columnIndices;
+//     std::vector<bool> isAggregateColumn;
+//     std::vector<FieldBlock> virtualFields; // For aggregates only
+
+//     for (const QString& col : op->columns) {
+//         bool found = false;
+//         if (is virtual field) {
+//             virtualFields.push_back(...);
+//         }
+
+//         // First try to find in actual table schema
+//         for (size_t i = 0; i < fields.size(); ++i) {
+//             if (QString::fromUtf8(fields[i].name) == col.trimmed()) {
+//                 columnIndices.push_back(i);
+//                 isAggregateColumn.push_back(fields[i].isAggregateFunc);
+//                 found = true;
+//                 break;
+//             }
+//         }
+
+//         if (std::any_of(isAggregateColumn.begin(), isAggregateColumn.end(),
+//                         [](bool b){ return b; })) {
+//             temp.handleAggregateSelect(op, fields, virtualFields, resultRows);
+//         } else {
+//             temp.handleRegularSelect(op, fields, resultRows, columnIndices);
+//         }
+
+//         // If not found, check if it's a function expression
+//         if (!found) {
+//             QRegularExpression funcRegex("(\\w+)\\(\\s*([\\w\\*]+)\\s*\\)");
+//             QRegularExpressionMatch match = funcRegex.match(col);
+
+//             if (match.hasMatch()) {
+//                 FieldBlock virtualField;
+//                 memset(&virtualField, 0, sizeof(FieldBlock));
+
+//                 QString funcName = match.captured(1).toUpper();
+//                 QString fieldName = match.captured(2).trimmed();
+
+//                 strncpy(virtualField.name, col.toUtf8().constData(), 127);
+//                 virtualField.isAggregateFunc = true;
+
+//                 // Fill FunctionCall struct
+//                 strncpy(virtualField.func.funcName, funcName.toUtf8().constData(), 31);
+//                 strncpy(virtualField.func.fieldName, fieldName.toUtf8().constData(), 127);
+
+//                 if (funcName == "COUNT") virtualField.func.funcType = FT_COUNT;
+//                 else if (funcName == "MAX") virtualField.func.funcType = FT_MAX;
+//                 else if (funcName == "MIN") virtualField.func.funcType = FT_MIN;
+//                 else if (funcName == "AVG") virtualField.func.funcType = FT_AVG;
+//                 else if (funcName == "SUM") virtualField.func.funcType = FT_SUM;
+
+//                 virtualField.type = (funcName == "COUNT") ? DT_INTEGER : DT_DOUBLE;
+
+//                 virtualFields.push_back(virtualField);
+//                 isAggregateColumn.push_back(true);
+//                 columnIndices.push_back(-1); // Placeholder for real field index
+//                 found = true;
+//             }
+//         }
+
+//         if (!found) {
+//             throw std::runtime_error("Column not found: " + col.toStdString());
+//         }
+//     }
+
+//     // for (const QString& col : op->columns) {
+//     //     bool found = false;
+//     //     for (size_t i = 0; i < fields.size(); ++i) {
+//     //         if (QString::fromUtf8(fields[i].name) == col.trimmed()) {
+//     //             columnIndices.push_back(i);
+//     //             isAggregateColumn.push_back(fields[i].isAggregateFunc);
+//     //             found = true;
+//     //             break;
+//     //         }
+//     //     }
+//     //     if (!found) throw std::runtime_error("Column not found: " + col.toStdString());
+//     // }
+
+//     // Filter rows using WHERE clause
+//     std::vector<DataRow> resultRows;
+//     TupleManager temp;
+//     for (const auto& row : rows) {
+
+//         if (temp.matchesWhereConditions(row, fields, op->conditions)) {
+//             resultRows.push_back(row);
+//         }
+//     }
+
+//     // Decide whether to compute aggregates
+//     if (std::any_of(isAggregateColumn.begin(), isAggregateColumn.end(),
+//                     [](bool b){ return b; })) {
+//         temp.handleAggregateSelect(op, fields, resultRows, columnIndices);
+//     } else {
+//         temp.handleRegularSelect(op, fields, resultRows, columnIndices);
+//     }
+// }
 
 // simplied sample
 // void TupleManager::selectColumns(const SelectColumnsOperation* op) {
@@ -1023,24 +1167,52 @@ QString TupleManager::formatValue(const FieldValue& val, DataType type) {
 
 //     widget->showMessage(message);
 // }
+// void TupleManager::handleAggregateSelect(
+//     const SelectColumnsOperation* op,
+//     const std::vector<FieldBlock>& fields,
+//     const std::vector<DataRow>& rows,
+//     const std::vector<int>& columnIndices)
+// {
+//     QStringList headerLabels;
+//     QList<FieldValue> results;
+
+//     for (int idx : columnIndices) {
+//         const FieldBlock& field = fields[idx];
+//         if (field.isAggregateFunc) {
+//             headerLabels << field.name;
+//             results.append(calculateFunction(field, fields, rows));
+//         }
+//     }
+
+//     // Format output
+//     QString message = "+-" + QString("-+-").repeated(headerLabels.size() - 1) + "-+\n";
+//     message += "| " + headerLabels.join(" | ") + " |\n";
+//     message += "+-" + QString("-+-").repeated(headerLabels.size() - 1) + "-+\n";
+
+//     message += "| ";
+//     for (const FieldValue& val : results) {
+//         message += formatFunctionValue(val) + " | ";
+//     }
+//     message += "\n+-------------------------------------------+\n";
+
+//     widget->showMessage(message);
+// }
 void TupleManager::handleAggregateSelect(
     const SelectColumnsOperation* op,
-    const std::vector<FieldBlock>& fields,
-    const std::vector<DataRow>& rows,
-    const std::vector<int>& columnIndices)
+    const std::vector<FieldBlock>& allFields,
+    const std::vector<FieldBlock>& virtualFields,
+    const std::vector<DataRow>& rows)
 {
     QStringList headerLabels;
     QList<FieldValue> results;
 
-    for (int idx : columnIndices) {
-        const FieldBlock& field = fields[idx];
-        if (field.isAggregateFunc) {
-            headerLabels << field.name;
-            results.append(calculateFunction(field, fields, rows));
-        }
+    // Process each virtual field
+    for (const auto& field : virtualFields) {
+        headerLabels << field.name;
+        results.append(calculateFunction(field, allFields, rows));
     }
 
-    // Format output
+    // Format result
     QString message = "+-" + QString("-+-").repeated(headerLabels.size() - 1) + "-+\n";
     message += "| " + headerLabels.join(" | ") + " |\n";
     message += "+-" + QString("-+-").repeated(headerLabels.size() - 1) + "-+\n";

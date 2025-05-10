@@ -28,9 +28,9 @@ private:
     QString formatValue(const FieldValue& val, DataType type);
     void handleAggregateSelect(
         const SelectColumnsOperation* op,
-        const std::vector<FieldBlock>& fields,
-        const std::vector<DataRow>& rows,
-        const std::vector<int>& columnIndices);
+        const std::vector<FieldBlock>& allFields,
+        const std::vector<FieldBlock>& virtualFields,
+        const std::vector<DataRow>& rows);
     QString formatFunctionValue(const FieldValue& val);
     QString formatFieldValue(const FieldValue& val);
     void handleRegularSelect(
