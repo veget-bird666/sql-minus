@@ -5,11 +5,15 @@ extern QString currentDB;
 // 创建数据库操作
 CreateTableOperation::CreateTableOperation(QString tableName, QList<FieldBlock> fields) {
     // 获取表定义文件
+    int size = 0;
     for (FieldBlock fieldBlock : fields) {
-        // if(fieldBlock.isAggregateFunc) {
+        if(!fieldBlock.isAggregateFunc) {
+            field_blocks.push_back(fieldBlock);
+            size++;
+        } // 以聚合函数都位于末尾为前提的改进
         //     throw std::runtime_error("创建操作中不能有聚合函数");
         // }
-        field_blocks.push_back(fieldBlock);
+
         extractIntegrityConstraints(fieldBlock);
         // if (strlen(fieldBlock.ref_field)){
         //     IntegrityConstraint fk;
@@ -32,7 +36,7 @@ CreateTableOperation::CreateTableOperation(QString tableName, QList<FieldBlock> 
     // 填充字段
     strncpy(newTableBlock.name, tableName.toUtf8().constData(), 128);
     newTableBlock.record_num = 0;
-    newTableBlock.field_num = fields.size();
+    newTableBlock.field_num = size;
 
     strncpy(newTableBlock.tdf, ("D:/DBMS_ROOT/data/" + dbName + "/" + tableName + ".tdf").toUtf8().constData(), 256);
     strncpy(newTableBlock.trd, ("D:/DBMS_ROOT/data/" + dbName + "/" + tableName + ".trd").toUtf8().constData(), 256);
