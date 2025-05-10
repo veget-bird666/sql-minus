@@ -24,10 +24,18 @@ void TupleManager::insert(const InsertOperation* op) {
 
     // 2. 校验字段数量和类型
     auto fields = FileUtil::readTableFields(op->dbName, op->tableName);
-    if (fields.size() != op->values.size()) {
+
+    // 去除所有聚合函数, 我认为聚合函数都在最后
+    int j = 0;
+    for (FieldBlock fieldBlock : fields) {
+        if (!fieldBlock.isAggregateFunc) ++j;
+    }
+    // 去除所有聚合函数完成
+
+    if (j != op->values.size()) {
         throw std::runtime_error("Field count mismatch");
     }
-    for (size_t i = 0; i < fields.size(); i++) {
+    for (size_t i = 0; i < j; i++) {
         if (fields[i].type != op->values[i].type) {
             throw std::runtime_error("Field type mismatch");
         }
