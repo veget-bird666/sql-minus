@@ -64,7 +64,7 @@ void TupleManager::insert(const InsertOperation* op) {
 }
 
 // 查询所有记录
-void TupleManager::selectAll(const SelectAllOperation* operation) {
+/*void TupleManager::selectAll(const SelectAllOperation* operation) {
 
     QString dbName = operation->dbName;
     QString tableName = operation->tableName;
@@ -83,7 +83,7 @@ void TupleManager::selectAll(const SelectAllOperation* operation) {
             throw std::runtime_error("Field count mismatch between table definition and data");
         }
         // 格式化输出
-        QString message = QString("+");
+        QString message = QString("SELECT_RESPONSE\n+");
         for (const auto& field : fields) {
             message += QString("-").repeated(20) + "+";
         }
@@ -134,7 +134,89 @@ void TupleManager::selectAll(const SelectAllOperation* operation) {
     } catch (const std::exception& e) {
         widget->showMessage("Error: " + QString::fromStdString(e.what()));
     }
+}*/
+
+void TupleManager::selectAll(const SelectAllOperation* operation) {
+    QString dbName = operation->dbName;
+    QString tableName = operation->tableName;
+
+    qDebug() << "成功进入查询*的Manager";
+
+    try {
+        // 读取表的字段定义
+        std::vector<FieldBlock> fields = FileUtil::readTableFields(dbName, tableName);
+        // 读取表的所有记录
+        std::vector<DataRow> rows = FileUtil::readAllDataRows(dbName, tableName);
+
+        // 检查字段数是否匹配
+        if (!fields.empty() && !rows.empty() && fields.size() != rows[0].header.fieldCount) {
+            throw std::runtime_error("Field count mismatch between table definition and data");
+        }
+
+        /**************** 生成表格样式消息 ****************/
+        QString message = "SELECT_RESPONSE\n";
+
+        // 生成分隔线模板（例如：+---------------------+------------+----------+----------------+）
+        auto generateSeparator = [&]() {
+            QString separator = "+";
+            for (const auto& field : fields) {
+                // 根据字段名动态计算列宽（示例固定为20字符）
+                separator += QString("-").repeated(20) + "+";
+            }
+            return separator + "\n";
+        };
+
+        // 首部分隔线
+        message += generateSeparator();
+
+        // 表头行
+        message += "|";
+        for (const auto& field : fields) {
+            QString header = QString::fromUtf8(field.name);
+            message += " " + header.leftJustified(18, ' ') + " |"; // 固定18字符宽度+两侧空格
+        }
+        message += "\n";
+
+        // 表头后分隔线
+        message += generateSeparator();
+
+        // 数据行
+        for (const auto& row : rows) {
+            message += "|";
+            for (int i = 0; i < row.header.fieldCount; i++) {
+                FieldValue value = row.values[i];
+                QString valueStr;
+
+                // 类型转换（保持原有逻辑）
+                switch (value.type) {
+                case DT_INTEGER: valueStr = QString::number(value.intVal); break;
+                case DT_BOOL: valueStr = value.boolVal ? "true" : "false"; break;
+                case DT_DOUBLE: valueStr = QString::number(value.doubleVal, 'f', 2); break;
+                case DT_VARCHAR: valueStr = QString::fromUtf8(value.varcharVal); break;
+                case DT_DATETIME: valueStr = QDateTime::fromSecsSinceEpoch(value.intVal)
+                                   .toString("yyyy-MM-dd HH:mm:ss"); break;
+                default: valueStr = "UNKNOWN";
+                }
+
+                // 对齐数据（与表头格式一致）
+                message += " " + valueStr.leftJustified(18, ' ') + " |";
+            }
+            message += "\n";
+        }
+
+        // 最终分隔线
+        message += generateSeparator();
+
+        // 显示消息
+        widget->showMessage(message);
+
+    } catch (const std::exception& e) {
+        widget->showMessage("Error: " + QString::fromStdString(e.what()));
+    }
 }
+
+
+
 
 
 
