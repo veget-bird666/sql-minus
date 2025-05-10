@@ -115,7 +115,8 @@ Operation* SqlParser::parse(const QString& sql) {
     if (addMatch.hasMatch()) {
         QString tableName = addMatch.captured(1).trimmed();
         QList<FieldBlock> fields = extractFields(addMatch.captured(2));
-        if (fields.size() != 1) throw std::invalid_argument("只能添加一个字段");
+
+        // if (fields.size() != 1) throw std::invalid_argument("只能添加一个字段"); // 不用throw
         return new AddColumnOperation(currentDB, tableName, fields.first());
     }
 
@@ -142,7 +143,7 @@ Operation* SqlParser::parse(const QString& sql) {
     if (modifyMatch.hasMatch()) {
         QString tableName = modifyMatch.captured(1).trimmed();
         QList<FieldBlock> fields = extractFields(modifyMatch.captured(2));
-        if (fields.size() != 1) throw std::invalid_argument("只能修改一个字段");
+        // if (fields.size() != 1) throw std::invalid_argument("只能修改一个字段"); // 不用throw
         return new ModifyColumnOperation(currentDB, tableName,
                                          QString::fromUtf8(fields.first().name), fields.first());
     }
