@@ -39,7 +39,9 @@ void Widget::on_executeButton_clicked()
 
         Operation* o = SqlParser::parse(sql_command);
         o->execute();
-    } catch (...) {
+    } catch (const std::exception& e) {
+        showMessage(QString("错误: ") + e.what());
+    } catch (...){
         showMessage("SQL command is not correct.");
     }
 }
@@ -49,8 +51,8 @@ void Widget::on_executeButton_clicked()
 void Widget::showMessage(QString message){
     ui->informationEdit->append(message);
 
-    server->clientSocket->write(message.toUtf8());
-    server->clientSocket->flush();
+    // server->clientSocket->write(message.toUtf8());
+    // server->clientSocket->flush();
 
 
 }

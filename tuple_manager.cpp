@@ -24,10 +24,18 @@ void TupleManager::insert(const InsertOperation* op) {
 
     // 2. 校验字段数量和类型
     auto fields = FileUtil::readTableFields(op->dbName, op->tableName);
-    if (fields.size() != op->values.size()) {
+
+    // 去除所有聚合函数, 我认为聚合函数都在最后
+    int j = 0;
+    for (FieldBlock fieldBlock : fields) {
+        if (!fieldBlock.isAggregateFunc) ++j;
+    }
+    // 去除所有聚合函数完成
+
+    if (j != op->values.size()) {
         throw std::runtime_error("Field count mismatch");
     }
-    for (size_t i = 0; i < fields.size(); i++) {
+    for (size_t i = 0; i < j; i++) {
         if (fields[i].type != op->values[i].type) {
             throw std::runtime_error("Field type mismatch");
         }
@@ -879,6 +887,65 @@ FieldValue TupleManager::calculateFunction(
 
     return result;
 }
+
+// 更新数据
+void TupleManager::update(const UpdateOperation* op) {
+    // 1. 读取表的所有记录
+    std::vector<DataRow> allRows = FileUtil::readAllDataRows(op->dbName, op->tableName);
+    std::vector<FieldBlock> fields = FileUtil::readTableFields(op->dbName, op->tableName);
+
+    // 2. 找出要更新的行并更新
+    int updatedCount = 0;
+    for (auto& row : allRows) {
+        TupleManager temp;
+        if (temp.matchesWhereConditions(row, fields, op->conditions)) {
+            // 更新匹配的行
+            for (const auto& setClause : op->setClauses) {
+                // 查找字段索引
+                int fieldIndex = -1;
+                for (size_t i = 0; i < fields.size(); i++) {
+                    if (strcmp(fields[i].name, setClause.fieldName) == 0) {
+                        fieldIndex = i;
+                        break;
+                    }
+                }
+
+                if (fieldIndex != -1 && fieldIndex < row.values.size()) {
+                    // 执行更新
+                    row.values[fieldIndex] = setClause.newValue;
+                    updatedCount++;
+                }
+            }
+        }
+    }
+
+    // 3. 将更新后的数据写回文件
+    QString trdPath = FileUtil::generateTableFilePath(op->dbName, op->tableName, "trd");
+    QFile trdFile(trdPath);
+    if (!trdFile.open(QIODevice::WriteOnly)) {
+        throw std::runtime_error("无法打开记录文件");
+    }
+
+    for (const DataRow& row : allRows) {
+        trdFile.write(reinterpret_cast<const char*>(&row.header), sizeof(DataRowHeader));
+        trdFile.write(reinterpret_cast<const char*>(row.values.data()),
+                      row.values.size() * sizeof(FieldValue));
+    }
+    trdFile.close();
+
+    // 4. 更新表的修改时间
+    auto tables = FileUtil::readAllTableBlocks(op->dbName);
+    for (auto& table : tables) {
+        if (strcmp(table.name, op->tableName.toUtf8().constData()) == 0) {
+            table.mtime = QDateTime::currentSecsSinceEpoch();
+            break;
+        }
+    }
+    FileUtil::updateTableBlocks(op->dbName, tables);
+
+    widget->showMessage(QString("成功更新%1条记录").arg(updatedCount));
+}
+
 // FieldValue TupleManager::calculateFunction(
 //     const FieldBlock& funcField,
 //     const std::vector<FieldBlock>& allFields,

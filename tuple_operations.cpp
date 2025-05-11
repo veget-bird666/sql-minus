@@ -17,3 +17,7 @@ void DeleteOperation::execute() {
 void SelectColumnsOperation::execute() {
     TupleManager::selectColumns(this);
 }
+
+void UpdateOperation::execute() {
+    TupleManager::update(this);
+}

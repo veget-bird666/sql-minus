@@ -236,7 +236,11 @@ struct Condition {
 #pragma pack(pop)
 
 
-
+// 在structures.h中添加
+struct UpdateSetClause {
+    char fieldName[128];  // 要更新的字段名
+    FieldValue newValue;  // 新值
+};
 
 #endif // STRUCTURES_H
 

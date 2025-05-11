@@ -16,6 +16,8 @@ public:
     static void selectAll(const SelectAllOperation* operation);
     // 删除记录
     static void deleteRows(const DeleteOperation* op);
+    // 更新记录
+    static void update(const UpdateOperation* op);
     // 查询部分记录
     static void selectColumns(const SelectColumnsOperation* op);
 private:

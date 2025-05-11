@@ -61,4 +61,22 @@ class SelectColumnsOperation : public TupleOperation {
         void execute() override;
     };
 
+
+    // 在tuple_operations.h中添加
+    class UpdateOperation : public TupleOperation {
+    public:
+        QString dbName;
+        QString tableName;
+        std::vector<UpdateSetClause> setClauses;  // SET子句
+        std::vector<Condition> conditions;  // WHERE条件
+
+        UpdateOperation(const QString& db, const QString& table,
+                        const std::vector<UpdateSetClause>& sets,
+                        const std::vector<Condition>& conds)
+            : dbName(db), tableName(table), setClauses(sets), conditions(conds) {}
+
+        void execute() override;
+    };
+
+
 #endif
