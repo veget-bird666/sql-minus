@@ -216,6 +216,54 @@ Operation* SqlParser::parse(const QString& sql) {
         return new DeleteOperation(currentDB, tableName, conditions);
     }
 
+    // 在SqlParser::parse()方法中添加UPDATE解析
+    static QRegularExpression updateRegex(
+        "^UPDATE\\s+(\\w+)\\s+SET\\s+(.+?)(?:\\s+WHERE\\s+(.+))?\\s*;$",
+        QRegularExpression::CaseInsensitiveOption
+        );
+
+    QRegularExpressionMatch updateMatch = updateRegex.match(sql);
+    if (updateMatch.hasMatch()) {
+        QString tableName = updateMatch.captured(1).trimmed();
+        QString setClause = updateMatch.captured(2).trimmed();
+        QString whereClause = updateMatch.captured(3).trimmed();
+
+        // 解析SET子句
+        std::vector<UpdateSetClause> setClauses;
+        QStringList setPairs = setClause.split(',', Qt::SkipEmptyParts);
+        for (const QString& pair : setPairs) {
+            QStringList parts = pair.split('=', Qt::SkipEmptyParts);
+            if (parts.size() != 2) {
+                throw std::invalid_argument("Invalid SET clause format");
+            }
+
+            UpdateSetClause clause;
+            QString fieldName = parts[0].trimmed();
+            strncpy(clause.fieldName, fieldName.toUtf8().constData(), sizeof(clause.fieldName));
+
+            // 读取表字段定义以确定类型
+            auto fields = FileUtil::readTableFields(currentDB, tableName);
+            auto it = std::find_if(fields.begin(), fields.end(),
+                                   [&fieldName](const FieldBlock& f) {
+                                       return QString::fromUtf8(f.name) == fieldName;
+                                   });
+            if (it == fields.end()) {
+                throw std::invalid_argument("Field not found: " + fieldName.toStdString());
+            }
+
+            clause.newValue = stringToFieldValue(parts[1].trimmed(), static_cast<DataType>(it->type));
+            setClauses.push_back(clause);
+        }
+
+        // 解析WHERE条件
+        std::vector<Condition> conditions;
+        if (!whereClause.isEmpty()) {
+            auto fields = FileUtil::readTableFields(currentDB, tableName);
+            conditions = parseWhereClause(whereClause, fields);
+        }
+
+        return new UpdateOperation(currentDB, tableName, setClauses, conditions);
+    }
 
     // 匹配 SELECT * 语句
     static QRegularExpression selectAllRegex(
@@ -532,8 +580,9 @@ FieldValue SqlParser::stringToFieldValue(const QString& str, DataType type) {
         val.doubleVal = str.toDouble();
         break;
     case DT_VARCHAR: {
-        QString cleanStr = str;
+        QString cleanStr = str.trimmed(); // 先去除两端空白
         if (cleanStr.startsWith('\'') && cleanStr.endsWith('\'')) {
+            // 从第1个字符开始，取 length()-2 的长度（去掉首尾各一个引号）
             cleanStr = cleanStr.mid(1, cleanStr.length() - 2);
         }
         strncpy(val.varcharVal, cleanStr.toUtf8().constData(), sizeof(val.varcharVal));
