@@ -374,7 +374,7 @@ QString formatFunctionValue(const FieldValue& val) {
 //     // std::vector<DataRow> resultRows;
 //     // for (const auto& row : allRows) {
 //     //     bool matchAllConditions = true;
-        
+
 //     //     // WHERE条件判断
 //     //     for (const auto& cond : op->conditions) {
 //     //         int fieldIdx = -1;
@@ -384,7 +384,7 @@ QString formatFunctionValue(const FieldValue& val) {
 //     //                 break;
 //     //             }
 //     //         }
-            
+
 //     //         // if (fieldIdx == -1 || !cond.evaluate(row.values[fieldIdx])) {
 //     //         //     matchAllConditions = false;
 //     //         //     break;
@@ -399,7 +399,7 @@ QString formatFunctionValue(const FieldValue& val) {
 
 //     // 4. 构建输出
 //     QString message = QString("+-----------------").repeated(columnIndices.size()) + "+\n";
-    
+
 //     // 表头
 //     for (const QString& col : op->columns) {
 //         message += QString("| %1 ").arg(col.leftJustified(15, ' '));
@@ -843,7 +843,7 @@ FieldValue TupleManager::calculateFunction(
                                           [targetIndex](const DataRow& a, const DataRow& b) {
                                               TupleManager temp;
                                               return temp.compareFieldValues(a.values[targetIndex],
-                                                                        b.values[targetIndex]) < 0;
+                                                                             b.values[targetIndex]) < 0;
                                           });
             result = maxIt->values[targetIndex];
         }
@@ -855,7 +855,7 @@ FieldValue TupleManager::calculateFunction(
                                           [targetIndex](const DataRow& a, const DataRow& b) {
                                               TupleManager temp;
                                               return temp.compareFieldValues(a.values[targetIndex],
-                                                                        b.values[targetIndex]) < 0;
+                                                                             b.values[targetIndex]) < 0;
                                           });
             result = minIt->values[targetIndex];
         }
@@ -881,8 +881,8 @@ FieldValue TupleManager::calculateFunction(
         }
         break;
 
-    // default:
-    //     throw std::runtime_error("Unsupported function"); // 什么鬼问题
+        // default:
+        //     throw std::runtime_error("Unsupported function"); // 什么鬼问题
     }
 
     return result;
@@ -1318,8 +1318,8 @@ QString TupleManager::formatFieldValue(const FieldValue& val) {
     default:
         return "NULL";
     }
-// Note:
-//     DATETIME assumes stored as qint64 Unix timestamp — that’s fine if consistent.
+    // Note:
+    //     DATETIME assumes stored as qint64 Unix timestamp — that’s fine if consistent.
 }
 
 void TupleManager::handleRegularSelect(
