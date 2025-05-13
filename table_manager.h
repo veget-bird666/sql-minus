@@ -6,7 +6,7 @@
 class TableManager : Manager{
 public:
     static void createTable(const CreateTableOperation* operation);
-    static void showTables();
+    static void showTables(const ShowTablesOperation* operation);
     static void dropTable(const DropTableOperation* operation);
 
     static void addColumn(AddColumnOperation* operation);
