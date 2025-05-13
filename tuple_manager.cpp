@@ -61,6 +61,8 @@ void TupleManager::insert(const InsertOperation* op) {
     // 重新写入.tb文件（需实现FileUtil::updateTableBlocks）
     FileUtil::updateTableBlocks(op->dbName, tables);
     widget->showMessage("插入数据成功");
+    // 写入日志
+    FileUtil::appendLogRecord(op->dbName , op->logRecord);
 }
 
 // 查询所有记录
@@ -209,7 +211,8 @@ void TupleManager::selectAll(const SelectAllOperation* operation) {
 
         // 显示消息
         widget->showMessage(message);
-
+        // 写入日志
+        FileUtil::appendLogRecord(operation->dbName , operation->logRecord);
     } catch (const std::exception& e) {
         widget->showMessage("Error: " + QString::fromStdString(e.what()));
     }
@@ -288,6 +291,9 @@ void TupleManager::deleteRows(const DeleteOperation* op) {
     FileUtil::updateTableBlocks(op->dbName, tables);
 
     widget->showMessage(QString("成功删除%1条记录").arg(allRows.size() - remainingRows.size()));
+    // 写入日志
+    FileUtil::appendLogRecord(op->dbName , op->logRecord);
+
 }
 
 // 格式化
@@ -374,7 +380,7 @@ QString formatFunctionValue(const FieldValue& val) {
 //     // std::vector<DataRow> resultRows;
 //     // for (const auto& row : allRows) {
 //     //     bool matchAllConditions = true;
-        
+
 //     //     // WHERE条件判断
 //     //     for (const auto& cond : op->conditions) {
 //     //         int fieldIdx = -1;
@@ -384,7 +390,7 @@ QString formatFunctionValue(const FieldValue& val) {
 //     //                 break;
 //     //             }
 //     //         }
-            
+
 //     //         // if (fieldIdx == -1 || !cond.evaluate(row.values[fieldIdx])) {
 //     //         //     matchAllConditions = false;
 //     //         //     break;
@@ -399,7 +405,7 @@ QString formatFunctionValue(const FieldValue& val) {
 
 //     // 4. 构建输出
 //     QString message = QString("+-----------------").repeated(columnIndices.size()) + "+\n";
-    
+
 //     // 表头
 //     for (const QString& col : op->columns) {
 //         message += QString("| %1 ").arg(col.leftJustified(15, ' '));
@@ -504,6 +510,8 @@ void TupleManager::selectColumns(const SelectColumnsOperation* op) {
     } else {
         temp.handleRegularSelect(op, fields, resultRows, realColumnIndices);
     }
+    // 写入日志
+    FileUtil::appendLogRecord(op->dbName , op->logRecord);
 }
 // void TupleManager::selectColumns(const SelectColumnsOperation* op) {
 //     auto fields = FileUtil::readTableFields(op->dbName, op->tableName);
@@ -843,7 +851,7 @@ FieldValue TupleManager::calculateFunction(
                                           [targetIndex](const DataRow& a, const DataRow& b) {
                                               TupleManager temp;
                                               return temp.compareFieldValues(a.values[targetIndex],
-                                                                        b.values[targetIndex]) < 0;
+                                                                             b.values[targetIndex]) < 0;
                                           });
             result = maxIt->values[targetIndex];
         }
@@ -855,7 +863,7 @@ FieldValue TupleManager::calculateFunction(
                                           [targetIndex](const DataRow& a, const DataRow& b) {
                                               TupleManager temp;
                                               return temp.compareFieldValues(a.values[targetIndex],
-                                                                        b.values[targetIndex]) < 0;
+                                                                             b.values[targetIndex]) < 0;
                                           });
             result = minIt->values[targetIndex];
         }
@@ -881,8 +889,8 @@ FieldValue TupleManager::calculateFunction(
         }
         break;
 
-    // default:
-    //     throw std::runtime_error("Unsupported function"); // 什么鬼问题
+        // default:
+        //     throw std::runtime_error("Unsupported function"); // 什么鬼问题
     }
 
     return result;
@@ -944,6 +952,8 @@ void TupleManager::update(const UpdateOperation* op) {
     FileUtil::updateTableBlocks(op->dbName, tables);
 
     widget->showMessage(QString("成功更新%1条记录").arg(updatedCount));
+    // 写入日志
+    FileUtil::appendLogRecord(op->dbName , op->logRecord);
 }
 
 // FieldValue TupleManager::calculateFunction(
@@ -1318,8 +1328,8 @@ QString TupleManager::formatFieldValue(const FieldValue& val) {
     default:
         return "NULL";
     }
-// Note:
-//     DATETIME assumes stored as qint64 Unix timestamp — that’s fine if consistent.
+    // Note:
+    //     DATETIME assumes stored as qint64 Unix timestamp — that’s fine if consistent.
 }
 
 void TupleManager::handleRegularSelect(

@@ -31,6 +31,8 @@ void DatabaseManager::createDatabase(const CreateDatabaseOperation* operation) {
     FileUtil::createDatabaseFiles(dbName);
     FileUtil::appendDatabaseRecord(block);
 
+    // 写入日志
+    FileUtil::appendLogRecord(operation->dbName, operation->logRecord);
     // 返回信息
     widget->showMessage("成功创建数据库："+dbName+".");
 }
@@ -67,6 +69,8 @@ void DatabaseManager::dropDatabase(const DropDatabaseOperation* operation) {
     } catch (const std::exception& e) {
         widget->showMessage("数据库删除失败：" + QString::fromStdString(e.what()));
     }
+    // 写入日志
+    FileUtil::appendLogRecord(operation->dbName, operation->logRecord);
 }
 
 
@@ -108,9 +112,11 @@ void DatabaseManager::showDatabases(){
     } catch (const std::exception& e) {
         qCritical() << "读取数据库列表失败:" << e.what();
     }
+
 }
 
 void DatabaseManager::useDatabase(const UseDatabaseOperation* operation){
+
     QString dbName = operation->dbName;
     try {
         // 1. 检查是否为系统数据库（如 Ruanko）
@@ -133,6 +139,8 @@ void DatabaseManager::useDatabase(const UseDatabaseOperation* operation){
     }
 
     currentDB = operation->dbName;
+    // 写入日志
+    FileUtil::appendLogRecord(operation->dbName, operation->logRecord);
 }
 
 

@@ -4,6 +4,7 @@
 #include <QtGlobal>
 #include <vector>
 #include <cstring>
+#include <QDate>
 // 此文件用来定义文件存储时序列化、反序列化的所有结构体
 // 注：需求文件中的int值全部转为qin32 严格控制为32位
 
@@ -240,6 +241,16 @@ struct Condition {
 struct UpdateSetClause {
     char fieldName[128];  // 要更新的字段名
     FieldValue newValue;  // 新值
+};
+
+
+
+// 日志记录结构体
+struct LogRecord {
+    QString sql;          // SQL 原语句
+    QString type;         // 语句类型 (CREATE, INSERT, DELETE, etc.)
+    QDateTime time;       // 执行时间
+    QString rollbackToken;// 回滚属性 (事务标志)
 };
 
 #endif // STRUCTURES_H

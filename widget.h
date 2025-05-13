@@ -20,10 +20,14 @@ public:
 
     void showMessage(QString message);
 
+    void executeSqlStatement(const QString& sql);  // 执行单条SQL语句
+
 private slots:
     void on_executeButton_clicked();
 
     void on_clearButton_clicked();
+
+    void on_analysisButton_clicked();
 
 private:
     Ui::Widget *ui;

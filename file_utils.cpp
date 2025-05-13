@@ -8,6 +8,8 @@
 #include <QByteArray>
 #include <vector>
 #include <cstring>
+#include <QTextStream>
+
 
 extern QString currentDB;
 
@@ -519,4 +521,24 @@ std::vector<DataRow> FileUtil::readAllDataRows(const QString& dbName, const QStr
     }
 
     return rows;
+}
+
+
+// 附加日志记录
+void FileUtil::appendLogRecord(const QString& dbName, const LogRecord& log) {
+    // 日志文件路径：D:/DBMS_ROOT/data/dbName/dbName.log
+    QString logPath = QString("D:/DBMS_ROOT/data/%1/%1.log").arg(dbName);
+
+    QFile logFile(logPath);
+    if (!logFile.open(QIODevice::Append | QIODevice::Text)) {
+        throw std::runtime_error("无法打开日志文件");
+    }
+
+    QTextStream out(&logFile);
+    out << log.time.toString("yyyy-MM-dd HH:mm:ss") << "##"
+        << log.type << "##"
+        << log.sql << "##"
+        << log.rollbackToken << "\n";
+
+    logFile.close();
 }
