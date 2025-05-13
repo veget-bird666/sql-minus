@@ -1,6 +1,8 @@
 // server.cpp
 #include "server.h"
 #include <QDebug>
+#include "widget.h"
+extern Widget* widget;
 
 Server::Server(QObject *parent) : QTcpServer(parent) {
     if (!listen(QHostAddress::AnyIPv4, 12345)) {
@@ -56,10 +58,24 @@ void Server::readClientData() {
     qDebug() << "Received SQL command:" << sqlCommand;
 
     try {
-        Operation* operation = sqlParser.parse(sqlCommand);
-        operation->execute();
+        //Operation* operation = sqlParser.parse(sqlCommand);
+        //operation->execute();
+        int successCount = 0;
+        int failCount = 0;
+
+        SqlParser::executeMulti(sqlCommand, [&](const QString& sql) {
+            try {
+                widget->executeSqlStatement(sql);
+                successCount++;
+            } catch (const std::exception& e) {
+                widget->showMessage(QString("执行失败: ") + e.what());
+                failCount++;
+            }
+        });
+
+        widget->showMessage(QString("执行完成: 成功 %1 条, 失败 %2 条").arg(successCount).arg(failCount));
     } catch (const std::exception& e) {
-        clientSocket->write(QString("Error: %1").arg(e.what()).toUtf8());
+        widget->showMessage(QString("解析SQL失败: ") + e.what());
     }
     }
 

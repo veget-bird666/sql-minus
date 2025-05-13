@@ -38,7 +38,7 @@ void Widget::on_clearButton_clicked()
 void Widget::on_executeButton_clicked()
 {
 
-    QString sqlCommands = ui->commandEdit->toPlainText();
+    /*QString sqlCommands = ui->commandEdit->toPlainText();
 
     try {
         int successCount = 0;
@@ -58,7 +58,7 @@ void Widget::on_executeButton_clicked()
     } catch (const std::exception& e) {
         showMessage(QString("解析SQL失败: ") + e.what());
     }
-
+*/
     // QString sql_command = ui->commandEdit->toPlainText();
     // //QString sql_command = server.
     // try {

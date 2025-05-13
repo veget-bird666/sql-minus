@@ -8,6 +8,7 @@
 #include "database_manager.h"
 #include "file_utils.h"
 
+
 class Server : public QTcpServer {
     Q_OBJECT
 public:
