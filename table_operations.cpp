@@ -105,7 +105,7 @@ void CreateTableOperation::extractIntegrityConstraints(const FieldBlock& field) 
 
 // 显示所有表的操作类
 void ShowTablesOperation::execute() {
-    TableManager::showTables();
+    TableManager::showTables(this);
 }
 
 
