@@ -44,11 +44,12 @@ void TableManager::createTable(const CreateTableOperation* operation) {
 
     // 返回信息
     widget->showMessage("成功创建表："+tableName+".");
+    // 写入日志
+    FileUtil::appendLogRecord(operation->dbName, operation->logRecord);
 }
 
-
 // 管理展示所有表的操作
-void TableManager::showTables() {
+void TableManager::showTables(const ShowTablesOperation* operation) {
     QString dbName = currentDB;
 
     if (dbName.isEmpty()) {
@@ -80,6 +81,8 @@ void TableManager::showTables() {
     } catch (const std::exception& e) {
         widget->showMessage("Error showing tables: " + QString::fromStdString(e.what()));
     }
+    // 写入日志
+    FileUtil::appendLogRecord(currentDB , operation->logRecord);
 }
 
 // 管理删除表的操作
@@ -97,6 +100,8 @@ void TableManager::dropTable(const DropTableOperation* operation) {
 
     // 提示用户
     widget->showMessage("成功删除表: " + tableName);
+    // 写入日志
+    FileUtil::appendLogRecord(operation->dbName , operation->logRecord);
 }
 
 
@@ -145,6 +150,8 @@ void TableManager::describeTable(const DescribeTableOperation* operation) {
     message += "+---------------------+------------+----------+----------------+";
 
     widget->showMessage(message);
+    // 写入日志
+    FileUtil::appendLogRecord(operation->dbName , operation->logRecord);
 }
 
 // 管理添加字段
@@ -228,6 +235,8 @@ void TableManager::dropColumn(DropColumnOperation* operation) {
     }
 
     widget->showMessage("成功删除字段: " + operation->columnName);
+    // 写入日志
+    FileUtil::appendLogRecord(operation->dbName , operation->logRecord);
 }
 
 // 管理修改字段
@@ -247,6 +256,8 @@ void TableManager::modifyColumn(ModifyColumnOperation* operation) {
 
     FileUtil::updateTableDefinition(operation->dbName, operation->tableName, fields);
     widget->showMessage("成功修改字段: " + operation->oldColumnName);
+    // 写入日志
+    FileUtil::appendLogRecord(operation->dbName , operation->logRecord);
 }
 
 
