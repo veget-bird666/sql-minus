@@ -51,8 +51,8 @@ void Widget::on_executeButton_clicked()
 void Widget::showMessage(QString message){
     ui->informationEdit->append(message);
 
-    // server->clientSocket->write(message.toUtf8());
-    // server->clientSocket->flush();
+    server->clientSocket->write(message.toUtf8());
+    server->clientSocket->flush();
 
 
 }
