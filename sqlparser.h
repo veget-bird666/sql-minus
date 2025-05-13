@@ -17,6 +17,12 @@ public:
     // 解析WHERE条件
     static std::vector<Condition> parseWhereClause(const QString& whereClause, const std::vector<FieldBlock>& fields);
 
+    // 新增方法：处理可能包含换行和多条语句的SQL字符串
+    static void executeMulti(const QString& sql, std::function<void(const QString&)> executeCallback);
+
+    // 新增方法：从文件读取并执行SQL脚本
+    static void executeFromFile(const QString& filePath, std::function<void(const QString&)> executeCallback);
+
 private:
     // 解析单个条件表达式
     static Condition parseSingleCondition(const QString& conditionStr, const std::vector<FieldBlock>& fields);
