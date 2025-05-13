@@ -7,6 +7,7 @@
 #include "file_utils.h"
 #include <QDateTime>
 #include <cstring>
+#include <QFile>
 
 extern QString currentDB;
 
@@ -30,14 +31,28 @@ Operation* SqlParser::parse(const QString& sql) {
     QRegularExpressionMatch createMatch = createDbRegex.match(sql);
     if (createMatch.hasMatch()) {
         QString dbName = createMatch.captured(1).trimmed();
-        return new CreateDatabaseOperation(dbName);
+        Operation * operation = new CreateDatabaseOperation(dbName);
+
+        // 填充日志记录
+        operation->logRecord.sql = sql;
+        operation->logRecord.type = "CREATE DATABASE";
+        operation->logRecord.time = QDateTime::currentDateTime();
+        operation->logRecord.rollbackToken = "-1"; // 默认值
+        return operation;
     }
 
     // 匹配 DROP DATABASE
     QRegularExpressionMatch dropMatch = dropDbRegex.match(sql);
     if (dropMatch.hasMatch()) {
         QString dbName = dropMatch.captured(1).trimmed();
-        return new DropDatabaseOperation(dbName);
+
+        Operation * operation = new DropDatabaseOperation(dbName);
+        // 填充日志记录
+        operation->logRecord.sql = sql;
+        operation->logRecord.type = "DROP DATABASE";
+        operation->logRecord.time = QDateTime::currentDateTime();
+        operation->logRecord.rollbackToken = "-1"; // 默认值
+        return operation;
     }
 
     // 匹配 SHOW DATABASES
@@ -48,7 +63,14 @@ Operation* SqlParser::parse(const QString& sql) {
 
     QRegularExpressionMatch showMatch = showDatabasesRegex.match(sql);
     if (showMatch.hasMatch()) {
-        return new ShowDatabasesOperation(); // 返回对应的操作类
+        Operation * operation = new ShowDatabasesOperation();
+
+        // 填充日志记录
+        operation->logRecord.sql = sql;
+        operation->logRecord.type = "SHOW DATABASE";
+        operation->logRecord.time = QDateTime::currentDateTime();
+        operation->logRecord.rollbackToken = "-1"; // 默认值
+        return operation; // 返回对应的操作类
     }
     // 匹配 USE DATABASE
     static QRegularExpression useDbRegex(
@@ -59,7 +81,14 @@ Operation* SqlParser::parse(const QString& sql) {
     QRegularExpressionMatch useMatch = useDbRegex.match(sql);
     if (useMatch.hasMatch()) {
         QString dbName = useMatch.captured(1).trimmed();
-        return new UseDatabaseOperation(dbName); // 返回对应的操作对象
+        Operation * operation = new UseDatabaseOperation(dbName);
+        // qDebug()<<"111";
+        // 填充日志记录
+        operation->logRecord.sql = sql;
+        operation->logRecord.type = "USE DATABASE";
+        operation->logRecord.time = QDateTime::currentDateTime();
+        operation->logRecord.rollbackToken = "-1"; // 默认值
+        return operation;
     }
 
     // 匹配DROP TABLE
@@ -72,7 +101,15 @@ Operation* SqlParser::parse(const QString& sql) {
     if (dropTableMatch.hasMatch()) {
         QString tableName = dropTableMatch.captured(1).trimmed();
         QString dbName = currentDB;
-        return new DropTableOperation(dbName, tableName);
+        Operation * operation = new DropTableOperation(dbName, tableName);
+
+        // 填充日志记录
+        operation->logRecord.sql = sql;
+        operation->logRecord.type = "DROP TABLE";
+        operation->logRecord.time = QDateTime::currentDateTime();
+        operation->logRecord.rollbackToken = "-1"; // 默认值
+        return operation;
+
     }
 
     // 匹配 SHOW TABLES
@@ -83,7 +120,14 @@ Operation* SqlParser::parse(const QString& sql) {
 
     QRegularExpressionMatch showTablesMatch = showTablesRegex.match(sql);
     if (showTablesMatch.hasMatch()) {
-        return new ShowTablesOperation();
+        Operation * operation = new ShowTablesOperation();
+
+        // 填充日志记录
+        operation->logRecord.sql = sql;
+        operation->logRecord.type = "SHOW TABLES";
+        operation->logRecord.time = QDateTime::currentDateTime();
+        operation->logRecord.rollbackToken = "-1"; // 默认值
+        return operation;
     }
 
     // 匹配 CREATE TABLE
@@ -101,7 +145,14 @@ Operation* SqlParser::parse(const QString& sql) {
         QList<FieldBlock> fields = extractFields(tableDefinition);
 
         // 返回一个包含表名和字段信息的操作对象
-        return new CreateTableOperation(tableName, fields);
+        Operation * operation = new CreateTableOperation(tableName, fields);
+
+        // 填充日志记录
+        operation->logRecord.sql = sql;
+        operation->logRecord.type = "CREATE TABLE";
+        operation->logRecord.time = QDateTime::currentDateTime();
+        operation->logRecord.rollbackToken = "-1"; // 默认值
+        return operation;
     }
 
 
@@ -116,8 +167,14 @@ Operation* SqlParser::parse(const QString& sql) {
         QString tableName = addMatch.captured(1).trimmed();
         QList<FieldBlock> fields = extractFields(addMatch.captured(2));
 
-        // if (fields.size() != 1) throw std::invalid_argument("只能添加一个字段"); // 不用throw
-        return new AddColumnOperation(currentDB, tableName, fields.first());
+        Operation * operation = new AddColumnOperation(currentDB, tableName, fields.first());
+
+        // 填充日志记录
+        operation->logRecord.sql = sql;
+        operation->logRecord.type = "ALTER TABLE ADD COLUMN";
+        operation->logRecord.time = QDateTime::currentDateTime();
+        operation->logRecord.rollbackToken = "-1"; // 默认值
+        return operation;
     }
 
     // 匹配 ALTER TABLE DROP COLUMN
@@ -130,7 +187,16 @@ Operation* SqlParser::parse(const QString& sql) {
     if (dropColMatch.hasMatch()) {
         QString tableName = dropColMatch.captured(1).trimmed();
         QString columnName = dropColMatch.captured(2).trimmed();
-        return new DropColumnOperation(currentDB, tableName, columnName);
+
+        Operation * operation = new DropColumnOperation(currentDB, tableName, columnName);
+
+        // 填充日志记录
+        operation->logRecord.sql = sql;
+        operation->logRecord.type = "ALTER TABLE DROP COLUMN";
+        operation->logRecord.time = QDateTime::currentDateTime();
+        operation->logRecord.rollbackToken = "-1"; // 默认值
+        return operation;
+
     }
 
     // 匹配 ALTER TABLE MODIFY COLUMN
@@ -143,9 +209,17 @@ Operation* SqlParser::parse(const QString& sql) {
     if (modifyMatch.hasMatch()) {
         QString tableName = modifyMatch.captured(1).trimmed();
         QList<FieldBlock> fields = extractFields(modifyMatch.captured(2));
-        // if (fields.size() != 1) throw std::invalid_argument("只能修改一个字段"); // 不用throw
-        return new ModifyColumnOperation(currentDB, tableName,
-                                         QString::fromUtf8(fields.first().name), fields.first());
+
+        Operation * operation = new ModifyColumnOperation(currentDB, tableName,
+                                                         QString::fromUtf8(fields.first().name), fields.first());
+
+        // 填充日志记录
+        operation->logRecord.sql = sql;
+        operation->logRecord.type = "ALTER TABLE MODIFY COLUMN";
+        operation->logRecord.time = QDateTime::currentDateTime();
+        operation->logRecord.rollbackToken = "-1"; // 默认值
+        return operation;
+
     }
 
     // 匹配 DESC 或 DESCRIBE 表名
@@ -156,7 +230,15 @@ Operation* SqlParser::parse(const QString& sql) {
     QRegularExpressionMatch descMatch = descTableRegex.match(sql);
     if (descMatch.hasMatch()) {
         QString tableName = descMatch.captured(2).trimmed();
-        return new DescribeTableOperation(currentDB, tableName);
+
+        Operation * operation = new DescribeTableOperation(currentDB, tableName);
+        // 填充日志记录
+        operation->logRecord.sql = sql;
+        operation->logRecord.type = "DESC TABLE";
+        operation->logRecord.time = QDateTime::currentDateTime();
+        operation->logRecord.rollbackToken = "-1"; // 默认值
+        return operation;
+
     }
 
     // 匹配 INSERT 语句（格式：INSERT INTO table VALUES (v1, v2, ...);）
@@ -190,6 +272,13 @@ Operation* SqlParser::parse(const QString& sql) {
             }
             op->values.push_back(val);
         }
+
+        // 填充日志记录
+        op->logRecord.sql = sql;
+        op->logRecord.type = "INSERT INTO TABLE";
+        op->logRecord.time = QDateTime::currentDateTime();
+        op->logRecord.rollbackToken = "-1"; // 默认值
+
         return op;
     }
 
@@ -213,7 +302,14 @@ Operation* SqlParser::parse(const QString& sql) {
             conditions = parseWhereClause(whereClause, fields);
         }
 
-        return new DeleteOperation(currentDB, tableName, conditions);
+        Operation * operation = new DeleteOperation(currentDB, tableName, conditions);
+        // 填充日志记录
+        operation->logRecord.sql = sql;
+        operation->logRecord.type = "DELETE FROM TABLE";
+        operation->logRecord.time = QDateTime::currentDateTime();
+        operation->logRecord.rollbackToken = "-1"; // 默认值
+        return operation;
+
     }
 
     // 在SqlParser::parse()方法中添加UPDATE解析
@@ -262,7 +358,14 @@ Operation* SqlParser::parse(const QString& sql) {
             conditions = parseWhereClause(whereClause, fields);
         }
 
-        return new UpdateOperation(currentDB, tableName, setClauses, conditions);
+        Operation * operation = new UpdateOperation(currentDB, tableName, setClauses, conditions);
+        // 填充日志记录
+        operation->logRecord.sql = sql;
+        operation->logRecord.type = "UPDATE TABLE";
+        operation->logRecord.time = QDateTime::currentDateTime();
+        operation->logRecord.rollbackToken = "-1"; // 默认值
+        return operation;
+
     }
 
     // 匹配 SELECT * 语句
@@ -275,7 +378,13 @@ Operation* SqlParser::parse(const QString& sql) {
     if (selectMatch.hasMatch()) {
         QString tableName = selectMatch.captured(1).trimmed();
         QString dbName = currentDB;
-        return new SelectAllOperation(dbName, tableName);
+        Operation * operation = new SelectAllOperation(dbName, tableName);
+        // 填充日志记录
+        operation->logRecord.sql = sql;
+        operation->logRecord.type = "SELECT FROM TABLE";
+        operation->logRecord.time = QDateTime::currentDateTime();
+        operation->logRecord.rollbackToken = "-1"; // 默认值
+        return operation;
     }
 
     // 匹配 SELECT [属性] WHERE 语句
@@ -303,6 +412,11 @@ Operation* SqlParser::parse(const QString& sql) {
         if (!whereClause.isEmpty()) {
             auto fields = FileUtil::readTableFields(dbName, tableName);
             op->conditions = parseWhereClause(whereClause, fields);
+            // 填充日志记录
+            op->logRecord.sql = sql;
+            op->logRecord.type = "SELECT FROM TABLE";
+            op->logRecord.time = QDateTime::currentDateTime();
+            op->logRecord.rollbackToken = "-1"; // 默认值
         }
         return op;
     }
@@ -311,6 +425,8 @@ Operation* SqlParser::parse(const QString& sql) {
     // 如果都未匹配，抛出异常
     throw std::invalid_argument("输入指令格式错误");
 }
+
+
 
 QList<FieldBlock> SqlParser::extractFields(const QString& tableDefinition) {
     QList<FieldBlock> fields;
@@ -597,4 +713,49 @@ FieldValue SqlParser::stringToFieldValue(const QString& str, DataType type) {
     }
 
     return val;
+}
+
+
+// sqlparser.cpp
+void SqlParser::executeMulti(const QString& sql, std::function<void(const QString&)> executeCallback)
+{
+    // 预处理SQL：去除注释、标准化换行等
+    QString processedSql = sql;
+
+    // 1. 去除单行注释 (-- 注释)
+    processedSql.replace(QRegularExpression("--[^\n]*"), "");
+
+    // 2. 去除多行注释 (/* 注释 */)
+    processedSql.replace(QRegularExpression("/\\*.*?\\*/", QRegularExpression::DotMatchesEverythingOption), "");
+
+    // 3. 标准化换行符
+    processedSql.replace("\r\n", "\n");
+    processedSql.replace("\n"," ");
+
+    // 4. 按分号分割语句（考虑引号内的分号）
+    QRegularExpression splitRegex("((?:[^;'\"\n]|'[^']*'|\"[^\"]*\")+);");
+    QRegularExpressionMatchIterator it = splitRegex.globalMatch(processedSql);
+
+    while (it.hasNext()) {
+        QRegularExpressionMatch match = it.next();
+        QString singleSql = match.captured(1).trimmed();
+
+        if (!singleSql.isEmpty()) {
+            executeCallback(singleSql);
+        }
+    }
+}
+
+void SqlParser::executeFromFile(const QString& filePath, std::function<void(const QString&)> executeCallback)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        throw std::runtime_error("无法打开SQL脚本文件");
+    }
+
+    QTextStream in(&file);
+    QString sqlContent = in.readAll();
+    file.close();
+
+    executeMulti(sqlContent, executeCallback);
 }
