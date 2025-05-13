@@ -61,6 +61,8 @@ void TupleManager::insert(const InsertOperation* op) {
     // 重新写入.tb文件（需实现FileUtil::updateTableBlocks）
     FileUtil::updateTableBlocks(op->dbName, tables);
     widget->showMessage("插入数据成功");
+    // 写入日志
+    FileUtil::appendLogRecord(op->dbName , op->logRecord);
 }
 
 // 查询所有记录
@@ -209,7 +211,8 @@ void TupleManager::selectAll(const SelectAllOperation* operation) {
 
         // 显示消息
         widget->showMessage(message);
-
+        // 写入日志
+        FileUtil::appendLogRecord(operation->dbName , operation->logRecord);
     } catch (const std::exception& e) {
         widget->showMessage("Error: " + QString::fromStdString(e.what()));
     }
@@ -288,6 +291,9 @@ void TupleManager::deleteRows(const DeleteOperation* op) {
     FileUtil::updateTableBlocks(op->dbName, tables);
 
     widget->showMessage(QString("成功删除%1条记录").arg(allRows.size() - remainingRows.size()));
+    // 写入日志
+    FileUtil::appendLogRecord(op->dbName , op->logRecord);
+
 }
 
 // 格式化
@@ -504,6 +510,8 @@ void TupleManager::selectColumns(const SelectColumnsOperation* op) {
     } else {
         temp.handleRegularSelect(op, fields, resultRows, realColumnIndices);
     }
+    // 写入日志
+    FileUtil::appendLogRecord(op->dbName , op->logRecord);
 }
 // void TupleManager::selectColumns(const SelectColumnsOperation* op) {
 //     auto fields = FileUtil::readTableFields(op->dbName, op->tableName);
@@ -944,6 +952,8 @@ void TupleManager::update(const UpdateOperation* op) {
     FileUtil::updateTableBlocks(op->dbName, tables);
 
     widget->showMessage(QString("成功更新%1条记录").arg(updatedCount));
+    // 写入日志
+    FileUtil::appendLogRecord(op->dbName , op->logRecord);
 }
 
 // FieldValue TupleManager::calculateFunction(
