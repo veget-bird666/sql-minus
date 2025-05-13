@@ -68,6 +68,10 @@ public:
 
         // 新增方法：读取表的所有记录
         static std::vector<DataRow> readAllDataRows(const QString& dbName, const QString& tableName);
+
+        // 写入日志记录
+        static void appendLogRecord(const QString& dbName, const LogRecord& log);
+
 private:
 
 
