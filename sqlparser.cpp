@@ -259,8 +259,21 @@ Operation* SqlParser::parse(const QString& sql) {
 
         // 转换值类型（需根据表字段定义动态判断，此处简化）
         for (const QString& valStr : values) {
+            SqlParser temp;
             FieldValue val;
-            if (valStr.contains("'")) { // 字符串
+            if (valStr == "TRUE") {
+                val.type = DT_BOOL;
+                val.boolVal = true;
+            } else if (valStr == "FALSE") {
+                val.type = DT_BOOL;
+                val.boolVal = false;
+            } else if (temp.isDateValue(valStr)) {
+                val.type = DT_DATETIME;
+                QString dateStr = valStr.mid(1).chopped(1);
+                QDate date = QDate::fromString(dateStr, "yyyy-MM-dd");
+                val.intVal = static_cast<int>(date.startOfDay().toSecsSinceEpoch());
+            }
+            else if (valStr.contains("'")) { // 字符串
                 val.type = DT_VARCHAR;
                 strncpy(val.varcharVal, valStr.trimmed().mid(1, valStr.length() - 2).toUtf8(), 256);
             } else if (valStr.contains(".")) { // 浮点数
@@ -758,4 +771,10 @@ void SqlParser::executeFromFile(const QString& filePath, std::function<void(cons
     file.close();
 
     executeMulti(sqlContent, executeCallback);
+}
+
+bool SqlParser::isDateValue(const QString &input) {
+    QRegularExpression regex("^'\\d{4}-\\d{2}-\\d{2}'$"); // 示例：2001-01-01格式
+    QRegularExpressionMatch match = regex.match(input);
+    return match.hasMatch();
 }
