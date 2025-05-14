@@ -195,8 +195,9 @@ void TupleManager::selectAll(const SelectAllOperation* operation) {
                 case DT_BOOL: valueStr = value.boolVal ? "true" : "false"; break;
                 case DT_DOUBLE: valueStr = QString::number(value.doubleVal, 'f', 2); break;
                 case DT_VARCHAR: valueStr = QString::fromUtf8(value.varcharVal); break;
-                case DT_DATETIME: valueStr = QDateTime::fromSecsSinceEpoch(value.intVal)
-                                   .toString("yyyy-MM-dd HH:mm:ss"); break;
+                case DT_DATETIME: valueStr = //value.varcharVal;
+                    valueStr = QDateTime::fromSecsSinceEpoch(value.intVal).toString("yyyy-MM-dd HH:mm:ss");
+                    break;
                 default: valueStr = "UNKNOWN";
                 }
 
