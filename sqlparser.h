@@ -30,6 +30,8 @@ private:
     // 将字符串转换为FieldValue
     static FieldValue stringToFieldValue(const QString& str, DataType type);
 
+    // 判断是否符合日期输入格式
+    bool isDateValue(const QString &input);
 };
 
 #endif // SQLPARSER_H
