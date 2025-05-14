@@ -194,7 +194,12 @@ void TupleManager::selectAll(const SelectAllOperation* operation) {
                 case DT_INTEGER: valueStr = QString::number(value.intVal); break;
                 case DT_BOOL: valueStr = value.boolVal ? "true" : "false"; break;
                 case DT_DOUBLE: valueStr = QString::number(value.doubleVal, 'f', 2); break;
-                case DT_VARCHAR: valueStr = QString::fromUtf8(value.varcharVal); break;
+                case DT_VARCHAR: {
+                    valueStr = QString::fromUtf8(value.varcharVal);
+                    valueStr = valueStr.chopped(1); // 直接弹出最后的'
+                    break;
+                }
+
                 case DT_DATETIME: valueStr = //value.varcharVal;
                     valueStr = QDateTime::fromSecsSinceEpoch(value.intVal).toString("yyyy-MM-dd HH:mm:ss");
                     break;
@@ -1322,7 +1327,7 @@ QString TupleManager::formatFieldValue(const FieldValue& val) {
         return QString::number(val.doubleVal, 'f',
                                (val.doubleVal == floor(val.doubleVal)) ? 0 : 2);
     case DT_VARCHAR:
-        return QString::fromUtf8(val.varcharVal);
+        return (QString::fromUtf8(val.varcharVal)).chopped(1);
     case DT_DATETIME:
         // Assuming datetime is stored as string or Unix timestamp
         return QDateTime::fromSecsSinceEpoch(val.intVal).toString(Qt::ISODate);
