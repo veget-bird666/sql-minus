@@ -261,10 +261,10 @@ Operation* SqlParser::parse(const QString& sql) {
         for (const QString& valStr : values) {
             SqlParser temp;
             FieldValue val;
-            if (valStr == " TRUE" && valStr == " TRUE") {
+            if (valStr == " TRUE" || valStr == "TRUE") {
                 val.type = DT_BOOL;
                 val.boolVal = true;
-            } else if (valStr == " FALSE" && valStr == "FALSE") {
+            } else if (valStr == " FALSE" || valStr == "FALSE") {
                 val.type = DT_BOOL;
                 val.boolVal = false;
             } else if (temp.isDateValue(valStr)) {
