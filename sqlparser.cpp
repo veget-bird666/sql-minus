@@ -261,10 +261,10 @@ Operation* SqlParser::parse(const QString& sql) {
         for (const QString& valStr : values) {
             SqlParser temp;
             FieldValue val;
-            if (valStr == "TRUE") {
+            if (valStr == " TRUE" && valStr == " TRUE") {
                 val.type = DT_BOOL;
                 val.boolVal = true;
-            } else if (valStr == "FALSE") {
+            } else if (valStr == " FALSE" && valStr == "FALSE") {
                 val.type = DT_BOOL;
                 val.boolVal = false;
             } else if (temp.isDateValue(valStr)) {
@@ -272,8 +272,12 @@ Operation* SqlParser::parse(const QString& sql) {
                 QString dateStr = valStr.mid(1).chopped(1);
                 QDate date = QDate::fromString(dateStr, "yyyy-MM-dd");
                 val.intVal = static_cast<int>(date.startOfDay().toSecsSinceEpoch());
-            }
-            else if (valStr.contains("'")) { // 字符串
+            } else if (temp.isDateValue2(valStr)) {
+                val.type = DT_DATETIME;
+                QString dateStr = valStr.mid(2).chopped(1);
+                QDate date = QDate::fromString(dateStr, "yyyy-MM-dd");
+                val.intVal = static_cast<int>(date.startOfDay().toSecsSinceEpoch());
+            } else if (valStr.contains("'")) { // 字符串
                 val.type = DT_VARCHAR;
                 strncpy(val.varcharVal, valStr.trimmed().mid(1, valStr.length() - 2).toUtf8(), 256);
             } else if (valStr.contains(".")) { // 浮点数
@@ -775,6 +779,12 @@ void SqlParser::executeFromFile(const QString& filePath, std::function<void(cons
 
 bool SqlParser::isDateValue(const QString &input) {
     QRegularExpression regex("^'\\d{4}-\\d{2}-\\d{2}'$"); // 示例：2001-01-01格式
+    QRegularExpressionMatch match = regex.match(input);
+    return match.hasMatch();
+}
+
+bool SqlParser::isDateValue2(const QString &input) {
+    QRegularExpression regex("^ '\\d{4}-\\d{2}-\\d{2}'$"); // 示例：2001-01-01格式
     QRegularExpressionMatch match = regex.match(input);
     return match.hasMatch();
 }
