@@ -32,6 +32,7 @@ private:
 
     // 判断是否符合日期输入格式
     bool isDateValue(const QString &input);
+    bool isDateValue2(const QString &input);
 };
 
 #endif // SQLPARSER_H
