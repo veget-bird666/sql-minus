@@ -37,6 +37,6 @@ int main(int argc, char *argv[])
  * SELECT * FROM t06;
  * SELECT (sno , sname ) FROM t01 WHERE age > 18;
  * UPDATE employees SET salary = 5000, department = 'IT' WHERE id = 123;
- * UPDATE products SET price = price * 1.1 WHERE category = 'Electronics';
+
 
  */
