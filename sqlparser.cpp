@@ -279,7 +279,8 @@ Operation* SqlParser::parse(const QString& sql) {
                 val.intVal = static_cast<int>(date.startOfDay().toSecsSinceEpoch());
             } else if (valStr.contains("'")) { // 字符串
                 val.type = DT_VARCHAR;
-                strncpy(val.varcharVal, valStr.trimmed().mid(1, valStr.length() - 2).toUtf8(), 256);
+                QString varStr = valStr.chopped(1);
+                strncpy(val.varcharVal, varStr.trimmed().mid(1, valStr.length() - 2).toUtf8(), 256);
             } else if (valStr.contains(".")) { // 浮点数
                 val.type = DT_DOUBLE;
                 val.doubleVal = valStr.toDouble();
